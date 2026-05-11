@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/stockpilot}
+    username: ${DB_USER:stockpilot}
+    password: ${DB_PASSWORD:stockpilot}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # Use 'validate' in production; 'update' is okay for dev
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+# Custom Security Config
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: ${JWT_EXPIRATION:3600000}
+
+logging:
+  pattern:
+    console: "${CONSOLE_LOG_PATTERN:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %cyan(%msg%n)}"
