@@ -2,6 +2,7 @@ package com.stockpilot.backend.shared.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public abstract class TenantAwareEntity extends BaseEntity {
 
     @Column(nullable = false, updatable = false)
@@ -28,11 +30,6 @@ public abstract class TenantAwareEntity extends BaseEntity {
         } catch (Exception e) {
             throw new RuntimeException("Reflection failed for " + entityClass.getName(), e);
         }
-    }
-
-
-    protected TenantAwareEntity(UUID tenantId) {
-        this.tenantId = tenantId;
     }
 
     @Override

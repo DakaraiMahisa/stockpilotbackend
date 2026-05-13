@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.persistence.EntityNotFoundException;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -100,6 +103,24 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(AccountDisabledException.class)
+    public ResponseEntity<Map<String, String>> handleAccountDisabled(AccountDisabledException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("code", "ACCOUNT_DISABLED");
+        error.put("message", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(error);
+    }
+    @ExceptionHandler(TokenGenerationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTokenGeneration(TokenGenerationException ex) {
+        log.error("CRITICAL: JWT signing failed. This usually indicates a configuration issue: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("SECURITY_ERROR: An internal error occurred while securing your session."));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(

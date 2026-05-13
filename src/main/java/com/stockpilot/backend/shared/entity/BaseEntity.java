@@ -6,15 +6,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
+
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @MappedSuperclass
 @Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@SQLRestriction("deleted = false")
 public abstract class BaseEntity {
 
     @Id
@@ -33,5 +44,7 @@ public abstract class BaseEntity {
     @Version
     @Column(nullable = false)
     private Long version;
-}
 
+    @Column(name="deleted",nullable = false)
+    private boolean deleted = false;
+}

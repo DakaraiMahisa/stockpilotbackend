@@ -1,19 +1,21 @@
 package com.stockpilot.backend.identity.infrastructure.security.jwt;
 
+import com.stockpilot.backend.identity.domain.model.UserSession;
+import com.stockpilot.backend.shared.exception.TokenGenerationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,22 +31,24 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    public String generateAccessToken(UserDetails user, UUID tenantId, List<String> permissions) {
+    public String generateAccessToken(UserSession userSession) {
         Instant now = Instant.now();
         Instant expiryTime = now.plus(TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES);
 
         try {
             return Jwts.builder()
-                    .subject(user.getUsername())
-                    .claim(CLAIM_TENANT_ID, tenantId.toString())
-                    .claim(CLAIM_PERMISSIONS, permissions)
+                    .header().add("typ", "JWT").and()
+                    .subject(userSession.getUsername())
+                    .claim("user_id", userSession.getId().toString())
+                    .claim(CLAIM_TENANT_ID, userSession.getTenantId().toString())
+                    .claim(CLAIM_PERMISSIONS, userSession.getPermissions()) // List of Strings
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(expiryTime))
-                    .signWith(getSigningKey())
+                    .signWith(getSigningKey(), Jwts.SIG.HS256) // Modern JJWT syntax
                     .compact();
         } catch (Exception e) {
-            log.error("Error generating JWT token for user: {}", user.getUsername(), e);
-            throw new RuntimeException("Failed to generate JWT token", e);
+            log.error("JWT Generation failed for: {}", userSession.getUsername(), e);
+            throw new TokenGenerationException("Could not create secure session", e);
         }
     }
 
@@ -97,6 +101,17 @@ public class JwtService {
         }
     }
 
+    public UserSession extractUserSession(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return UserSession.builder()
+                .id(UUID.fromString(claims.get("user_id", String.class)))
+                .tenantId(UUID.fromString(claims.get(CLAIM_TENANT_ID, String.class)))
+                .email(claims.getSubject())
+                .permissions(new HashSet<>(claims.get(CLAIM_PERMISSIONS, List.class)))
+                .enabled(true)
+                .build();
+    }
+
     private Claims getClaimsFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -105,9 +120,8 @@ public class JwtService {
                 .getPayload();
     }
 
-
     private SecretKey getSigningKey() {
-        byte[] decodedKey = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(decodedKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
