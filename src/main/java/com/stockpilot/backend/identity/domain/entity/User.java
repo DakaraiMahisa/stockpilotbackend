@@ -10,9 +10,8 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
-
+@Entity
 @Table(name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(
