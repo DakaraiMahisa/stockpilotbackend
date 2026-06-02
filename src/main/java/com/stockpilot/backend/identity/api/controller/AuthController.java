@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -20,38 +20,38 @@ public class AuthController {
     private final SessionService sessionService;
     private final PasswordResetService passwordResetService;
 
-    @PostMapping("/login")
+    @PostMapping("/login/public")
     public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         TokenResponse tokenResponse = authService.login(loginRequest);
         return ResponseEntity.ok(ApiResponse.success(tokenResponse, "Login successful"));
     }
 
-    @PostMapping("/register")
+    @PostMapping("/register/public")
     public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         authService.register(registerRequest);
         return ResponseEntity.ok(ApiResponse.success(null, "Registration successful. Please check your email to verify your account."));
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/refresh/public")
     public ResponseEntity<ApiResponse<TokenResponse>> refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
         TokenResponse tokenResponse = tokenService.refreshToken(refreshTokenRequest);
         return ResponseEntity.ok(ApiResponse.success(tokenResponse, "Token refreshed successfully"));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/logout/public")
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         sessionService.revoke(authHeader);
         return ResponseEntity.ok(ApiResponse.success(null, "Logged out successfully"));
     }
 
-    @PostMapping("/forgot-password")
+    @PostMapping("/forgot-password/public")
     public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
         passwordResetService.initiate(forgotPasswordRequest);
         return ResponseEntity.ok(ApiResponse.success(null, "Password reset instructions sent to your email"));
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/reset-password/public")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
         passwordResetService.complete(resetPasswordRequest);
         return ResponseEntity.ok(ApiResponse.success(null, "Password has been reset successfully"));
