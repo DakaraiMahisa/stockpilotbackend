@@ -1,6 +1,7 @@
 package com.stockpilot.backend.identity.domain.repository;
 
 import com.stockpilot.backend.identity.domain.entity.Role;
+import com.stockpilot.backend.identity.domain.enums.RoleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +21,6 @@ public interface RoleRepository extends JpaRepository<Role, UUID> {
 
     Optional<Role> findByIdAndTenantId(UUID id, UUID tenantId);
 
-    Optional<Role> findByNameAndTenantId(String name, UUID tenantId);
+    Optional<Role> findByNameAndTenantId(RoleName name, UUID tenantId);
 }
 
