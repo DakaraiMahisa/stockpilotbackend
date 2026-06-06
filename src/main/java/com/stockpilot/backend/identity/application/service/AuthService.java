@@ -2,7 +2,6 @@ package com.stockpilot.backend.identity.application.service;
 
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.identity.application.dto.LoginRequest;
-import com.stockpilot.backend.identity.application.dto.RegisterRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
@@ -14,13 +13,13 @@ import com.stockpilot.backend.identity.domain.model.UserSession;
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
+import com.stockpilot.backend.tenant.domain.repository.TenantRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.shared.exception.AccountDisabledException;
 import com.stockpilot.backend.shared.exception.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
 import com.stockpilot.backend.shared.exception.ResourceNotFoundException;
 import com.stockpilot.backend.shared.utils.TenantContext;
-import com.stockpilot.backend.tenant.domain.repository.TenantRepository;
 import com.stockpilot.backend.tenant.service.TenantCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -140,14 +139,17 @@ public class AuthService {
     }
     @Transactional
     public TokenResponse login(LoginRequest request) {
-
-        UUID tenantId = TenantContext.getTenantId();
-
-        User user = userRepository.findByEmailAndTenantId(request.getEmail(), tenantId)
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
-
+        Tenant tenant = tenantRepository.findByCode(request.getTenantCode())
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid credentials"));
+        User user = userRepository.findByEmailAndTenantId(
+                        request.getEmail(),
+                        tenant.getId()
+                )
+                .orElseThrow(() ->
+                        new InvalidCredentialsException("Invalid credentials"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException("Invalid password");
         }
 
         if (!Boolean.TRUE.equals(user.getActive())) {
