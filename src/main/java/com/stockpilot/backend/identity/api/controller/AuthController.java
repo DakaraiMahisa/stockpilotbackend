@@ -22,6 +22,7 @@ public class AuthController {
     private final TokenService tokenService;
     private final SessionService sessionService;
     private final PasswordResetService passwordResetService;
+    private final VerificationService verificationService;
 
     @PostMapping("/login/public")
     public ResponseEntity<ApiResponse<TokenResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -64,5 +65,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
         passwordResetService.complete(resetPasswordRequest);
         return ResponseEntity.ok(ApiResponse.success(null, "Password has been reset successfully"));
+    }
+
+    @GetMapping("/verify-email/public")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
+        verificationService.verifyEmail(token);
+        return ResponseEntity.ok(ApiResponse.success(null, "Email verified successfully. You can now log in."));
     }
 }

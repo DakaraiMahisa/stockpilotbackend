@@ -6,6 +6,7 @@ import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
+import com.stockpilot.backend.identity.domain.events.UserRegisteredEvent;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.events.LoginSuccessEvent;
@@ -19,7 +20,6 @@ import com.stockpilot.backend.shared.exception.AccountDisabledException;
 import com.stockpilot.backend.shared.exception.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
 import com.stockpilot.backend.shared.exception.ResourceNotFoundException;
-import com.stockpilot.backend.shared.utils.TenantContext;
 import com.stockpilot.backend.tenant.service.TenantCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -118,18 +118,15 @@ public class AuthService {
                 .firstName(request.getFirstName().trim())
                 .lastName(request.getLastName().trim())
                 .role(ownerRole)
-                .active(true)
+                .active(false)
                 .emailVerified(false)
                 .mfaEnabled(false)
                 .build();
 
         userRepository.save(ownerUser);
 
-        // TODO:
-        // branchService.createDefaultBranch(tenant.getId());
-
-        // TODO:
-        // publish UserRegisteredEvent
+        // Publish UserRegisteredEvent
+        eventPublisher.publishEvent(new UserRegisteredEvent(this, ownerUser));
 
         log.info(
                 "Organization '{}' registered successfully with tenantId={}",
@@ -153,7 +150,11 @@ public class AuthService {
         }
 
         if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new AccountDisabledException("Your account has been deactivated");
+            throw new AccountDisabledException("Your account has been deactivated. Please verify your email first.");
+        }
+
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new AccountDisabledException("Please verify your email before logging in.");
         }
 
         Set<String> permissions = roleRepository.findPermissionsByRoleId(user.getRole().getId());
