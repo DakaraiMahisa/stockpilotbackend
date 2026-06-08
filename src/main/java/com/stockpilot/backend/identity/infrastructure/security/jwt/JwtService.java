@@ -1,6 +1,7 @@
 package com.stockpilot.backend.identity.infrastructure.security.jwt;
 
 import com.stockpilot.backend.identity.domain.model.UserSession;
+import com.stockpilot.backend.shared.exception.InvalidTokenException;
 import com.stockpilot.backend.shared.exception.TokenGenerationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -80,14 +81,34 @@ public class JwtService {
     }
 
     public UUID extractTenantId(String token) {
-        try {
-            Claims claims = getClaimsFromToken(token);
-            String tenantIdStr = claims.get(CLAIM_TENANT_ID, String.class);
-            return tenantIdStr != null ? UUID.fromString(tenantIdStr) : null;
-        } catch (Exception e) {
-            log.error("Error extracting tenant ID from token", e);
-            return null;
+        Claims claims = getClaimsFromToken(token);
+
+        String tenantId = claims.get(
+                CLAIM_TENANT_ID,
+                String.class
+        );
+
+        if (tenantId == null) {
+            throw new InvalidTokenException(
+                    "Tenant ID claim not found"
+            );
         }
+
+        return UUID.fromString(tenantId);
+    }
+
+    public UUID extractUserId(String token) {
+        Claims claims = getClaimsFromToken(token);
+
+        String userId = claims.get("user_id", String.class);
+
+        if (userId == null) {
+            throw new InvalidTokenException(
+                    "User ID claim not found"
+            );
+        }
+
+        return UUID.fromString(userId);
     }
 
     @SuppressWarnings("unchecked")

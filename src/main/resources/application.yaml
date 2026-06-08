@@ -29,12 +29,32 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USER}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connection-timeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 # Custom Security Config
 app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION:3600000}
 
+  backend-url: http://localhost:8080
+
+  mail:
+    from: ${EMAIL_USER}
 logging:
   pattern:
     console: "${CONSOLE_LOG_PATTERN:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %cyan(%msg%n)}"

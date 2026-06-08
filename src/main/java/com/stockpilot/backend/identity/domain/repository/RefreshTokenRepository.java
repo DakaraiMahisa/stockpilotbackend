@@ -16,7 +16,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
 
     @Modifying
     @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
-    void deleteByUserId(UUID userId);
+    void deleteAllByUserId(UUID userId);
 
     @Modifying
     @Query("DELETE FROM RefreshToken rt WHERE rt.expiryDate < :now")
@@ -24,4 +24,3 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
 
     Optional<RefreshToken> findByUserIdAndDeviceInfo(UUID userId, String deviceInfo);
 }
-
