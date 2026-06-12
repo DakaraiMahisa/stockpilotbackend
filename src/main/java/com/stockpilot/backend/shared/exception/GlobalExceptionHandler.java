@@ -175,5 +175,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.validationError(errorList));
     }
+
     
 }

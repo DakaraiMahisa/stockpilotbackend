@@ -51,7 +51,8 @@ app:
     secret: ${JWT_SECRET}
     expiration-ms: ${JWT_EXPIRATION:3600000}
 
-  backend-url: http://localhost:8080
+  frontend:
+    url: http://localhost:5173
 
   mail:
     from: ${EMAIL_USER}
