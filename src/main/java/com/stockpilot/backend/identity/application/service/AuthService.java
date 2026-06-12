@@ -139,6 +139,7 @@ public class AuthService {
         Tenant tenant = tenantRepository.findByCode(request.getTenantCode())
                 .orElseThrow(() ->
                         new InvalidCredentialsException("Invalid credentials"));
+        System.out.println("Tenant details: "+tenant.getCode());
         User user = userRepository.findByEmailAndTenantId(
                         request.getEmail(),
                         tenant.getId()

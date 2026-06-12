@@ -22,8 +22,8 @@ public class EmailService {
     @Value("${app.mail.from}")
     private String from;
 
-    @Value("${app.backend-url}")
-    private String backendUrl;
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     @Async
     public void sendVerificationEmail(
@@ -32,8 +32,8 @@ public class EmailService {
     ) {
 
         String verificationUrl =
-                backendUrl +
-                        "/api/v1/auth/verify-email?token=" +
+                frontendUrl +
+                        "/verify-email?token=" +
                         token;
 
         Context context = new Context();
@@ -90,7 +90,7 @@ public class EmailService {
 
     @Async
     public void sendPasswordResetEmail(String to, String token) {
-        String resetUrl = backendUrl + "/api/v1/auth/reset-password?token=" + token; // This should point to a frontend URL
+        String resetUrl = frontendUrl + "/reset-password?token=" + token; // This should point to a frontend URL
 
         Context context = new Context();
         context.setVariable("resetUrl", resetUrl);

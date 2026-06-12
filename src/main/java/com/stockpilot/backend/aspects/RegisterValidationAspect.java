@@ -47,7 +47,7 @@ public class RegisterValidationAspect {
         if (decision.isCompromised()) {
             errors.put("password", "This password is known to be compromised. Please choose a different one.");
         }
-
+        log.info("Errors:",errors);
         if (!errors.isEmpty()) {
             throw new RegistrationValidationException(errors);
         }
