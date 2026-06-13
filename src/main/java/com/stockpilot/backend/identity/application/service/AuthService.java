@@ -139,7 +139,6 @@ public class AuthService {
         Tenant tenant = tenantRepository.findByCode(request.getTenantCode())
                 .orElseThrow(() ->
                         new InvalidCredentialsException("Invalid credentials"));
-        System.out.println("Tenant details: "+tenant.getCode());
         User user = userRepository.findByEmailAndTenantId(
                         request.getEmail(),
                         tenant.getId()
@@ -176,13 +175,25 @@ public class AuthService {
                 .build();
     }
 
-    private RefreshToken createAndPersistRefreshToken(User user, String deviceInfo) {
-        RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(OffsetDateTime.now().plusDays(7))
-                .deviceInfo(deviceInfo)
-                .build();
+    private RefreshToken createAndPersistRefreshToken(
+            User user,
+            String deviceInfo) {
+
+        RefreshToken refreshToken =
+                refreshTokenRepository
+                        .findByUser(user)
+                        .orElseGet(() ->
+                                RefreshToken.builder()
+                                        .user(user)
+                                        .build()
+                        );
+
+        refreshToken.setToken(UUID.randomUUID().toString());
+        refreshToken.setExpiryDate(
+                OffsetDateTime.now().plusDays(7)
+        );
+        refreshToken.setDeviceInfo(deviceInfo);
+
         return refreshTokenRepository.save(refreshToken);
     }
 }

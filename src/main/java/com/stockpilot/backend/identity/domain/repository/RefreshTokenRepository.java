@@ -1,6 +1,7 @@
 package com.stockpilot.backend.identity.domain.repository;
 
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
+import com.stockpilot.backend.identity.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
     void deleteByExpiryDateBefore(OffsetDateTime now);
 
     Optional<RefreshToken> findByUserIdAndDeviceInfo(UUID userId, String deviceInfo);
+
+    Optional<RefreshToken> findByUser(User user);
 }

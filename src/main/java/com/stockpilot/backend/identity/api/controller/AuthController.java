@@ -35,8 +35,6 @@ public class AuthController {
     @PostMapping("/register/public")
     public ResponseEntity<ApiResponse<Void>> registerOrganization(
             @Valid @RequestBody RegisterOrganizationRequest request) {
-
-        log.info("Registration request received: {}", request.getEmail());
         authService.registerOrganization(request);
 
         return ResponseEntity

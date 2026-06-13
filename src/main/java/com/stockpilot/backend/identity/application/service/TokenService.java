@@ -56,13 +56,26 @@ public class TokenService {
                 .build();
     }
 
-    private RefreshToken createAndPersistRefreshToken(User user, String deviceInfo) {
-        RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(OffsetDateTime.now().plusDays(7))
-                .deviceInfo(deviceInfo)
-                .build();
+    private RefreshToken createAndPersistRefreshToken(
+            User user,
+            String deviceInfo
+    ) {
+
+        RefreshToken refreshToken =
+                refreshTokenRepository
+                        .findByUser(user)
+                        .orElse(
+                                RefreshToken.builder()
+                                        .user(user)
+                                        .build()
+                        );
+
+        refreshToken.setToken(UUID.randomUUID().toString());
+        refreshToken.setExpiryDate(
+                OffsetDateTime.now().plusDays(7)
+        );
+        refreshToken.setDeviceInfo(deviceInfo);
+
         return refreshTokenRepository.save(refreshToken);
     }
 }
