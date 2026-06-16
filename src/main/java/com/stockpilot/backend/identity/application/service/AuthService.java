@@ -10,7 +10,7 @@ import com.stockpilot.backend.identity.domain.events.UserRegisteredEvent;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.events.LoginSuccessEvent;
-import com.stockpilot.backend.identity.domain.model.UserSession;
+import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
@@ -162,12 +162,12 @@ public class AuthService {
         user.setLastLoginAt(OffsetDateTime.now());
         userRepository.save(user);
 
-        UserSession userSession = UserSession.fromUser(user, permissions);
+        CurrentUserPrincipal currentUserPrincipal = CurrentUserPrincipal.fromUser(user, permissions);
 
-        String accessToken = jwtService.generateAccessToken(userSession);
+        String accessToken = jwtService.generateAccessToken(currentUserPrincipal);
         RefreshToken refreshToken = createAndPersistRefreshToken(user, request.getDeviceInfo());
 
-        eventPublisher.publishEvent(new LoginSuccessEvent(this, userSession));
+        eventPublisher.publishEvent(new LoginSuccessEvent(this, currentUserPrincipal));
 
         return TokenResponse.builder()
                 .accessToken(accessToken)

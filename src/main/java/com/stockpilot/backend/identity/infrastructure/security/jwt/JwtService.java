@@ -1,6 +1,6 @@
 package com.stockpilot.backend.identity.infrastructure.security.jwt;
 
-import com.stockpilot.backend.identity.domain.model.UserSession;
+import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.shared.exception.InvalidTokenException;
 import com.stockpilot.backend.shared.exception.TokenGenerationException;
 import io.jsonwebtoken.Claims;
@@ -32,23 +32,23 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    public String generateAccessToken(UserSession userSession) {
+    public String generateAccessToken(CurrentUserPrincipal currentUserPrincipal) {
         Instant now = Instant.now();
         Instant expiryTime = now.plus(TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES);
 
         try {
             return Jwts.builder()
                     .header().add("typ", "JWT").and()
-                    .subject(userSession.getUsername())
-                    .claim("user_id", userSession.getId().toString())
-                    .claim(CLAIM_TENANT_ID, userSession.getTenantId().toString())
-                    .claim(CLAIM_PERMISSIONS, userSession.getPermissions()) // List of Strings
+                    .subject(currentUserPrincipal.getUsername())
+                    .claim("user_id", currentUserPrincipal.getId().toString())
+                    .claim(CLAIM_TENANT_ID, currentUserPrincipal.getTenantId().toString())
+                    .claim(CLAIM_PERMISSIONS, currentUserPrincipal.getPermissions()) // List of Strings
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(expiryTime))
                     .signWith(getSigningKey(), Jwts.SIG.HS256) // Modern JJWT syntax
                     .compact();
         } catch (Exception e) {
-            log.error("JWT Generation failed for: {}", userSession.getUsername(), e);
+            log.error("JWT Generation failed for: {}", currentUserPrincipal.getUsername(), e);
             throw new TokenGenerationException("Could not create secure session", e);
         }
     }
@@ -122,9 +122,9 @@ public class JwtService {
         }
     }
 
-    public UserSession extractUserSession(String token) {
+    public CurrentUserPrincipal extractUserSession(String token) {
         Claims claims = getClaimsFromToken(token);
-        return UserSession.builder()
+        return CurrentUserPrincipal.builder()
                 .id(UUID.fromString(claims.get("user_id", String.class)))
                 .tenantId(UUID.fromString(claims.get(CLAIM_TENANT_ID, String.class)))
                 .email(claims.getSubject())
