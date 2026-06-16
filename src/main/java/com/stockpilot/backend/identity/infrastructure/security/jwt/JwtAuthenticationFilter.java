@@ -1,6 +1,6 @@
 package com.stockpilot.backend.identity.infrastructure.security.jwt;
 
-import com.stockpilot.backend.identity.domain.model.UserSession;
+import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.shared.utils.TenantContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = extractTokenFromRequest(request);
 
             if (token != null && jwtService.validateToken(token)) {
-                UserSession session = jwtService.extractUserSession(token);
+                CurrentUserPrincipal session = jwtService.extractUserSession(token);
 
                 TenantContext.setTenantId(session.getTenantId());
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

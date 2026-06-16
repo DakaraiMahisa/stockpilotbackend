@@ -4,7 +4,7 @@ import com.stockpilot.backend.identity.application.dto.RefreshTokenRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.User;
-import com.stockpilot.backend.identity.domain.model.UserSession;
+import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
@@ -45,9 +45,9 @@ public class TokenService {
         refreshTokenRepository.delete(refreshToken);
 
         Set<String> permissions = roleRepository.findPermissionsByRoleId(user.getRole().getId());
-        UserSession userSession = UserSession.fromUser(user, permissions);
+        CurrentUserPrincipal currentUserPrincipal = CurrentUserPrincipal.fromUser(user, permissions);
 
-        String newAccessToken = jwtService.generateAccessToken(userSession);
+        String newAccessToken = jwtService.generateAccessToken(currentUserPrincipal);
         RefreshToken newRefreshToken = createAndPersistRefreshToken(user, refreshToken.getDeviceInfo());
 
         return TokenResponse.builder()

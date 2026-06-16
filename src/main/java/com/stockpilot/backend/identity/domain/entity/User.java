@@ -1,5 +1,6 @@
 package com.stockpilot.backend.identity.domain.entity;
 
+import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
 import com.stockpilot.backend.shared.entity.TenantAwareEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,15 +13,18 @@ import lombok.experimental.SuperBuilder;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "users",
+@Table(
+        name = "users",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        columnNames = {"tenant_id", "email"},
-                        name = "uk_users_tenant_email"
+                        name = "uk_users_tenant_email",
+                        columnNames = {"tenant_id", "email"}
                 )
         },
         indexes = {
-                @Index(name = "idx_users_tenant_id", columnList = "tenant_id")
+                @Index(name = "idx_users_tenant_id", columnList = "tenant_id"),
+                @Index(name = "idx_users_tenant_role_id", columnList = "tenant_id, role_id"),
+                @Index(name = "idx_users_tenant_status", columnList = "tenant_id, status")
         }
 )
 @Getter
@@ -50,6 +54,28 @@ public class User extends TenantAwareEntity {
     @Builder.Default
     private Boolean active = true;
 
+    @Enumerated(EnumType.STRING)
+    @Column(
+            name = "status",
+            nullable = false,
+            length = 20,
+            columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'"
+    )
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Column(name = "locked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Builder.Default
+    private Boolean locked = false;
+
+    @Column(
+            name = "failed_login_attempts",
+            nullable = false,
+            columnDefinition = "INTEGER DEFAULT 0"
+    )
+    @Builder.Default
+    private Integer failedLoginAttempts = 0;
+
     @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     @Builder.Default
     private Boolean emailVerified = false;
@@ -58,7 +84,13 @@ public class User extends TenantAwareEntity {
     @Builder.Default
     private Boolean mfaEnabled = false;
 
+    @Column(name = "invited_at", columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime invitedAt;
+
     @Column(name = "last_login_at", columnDefinition = "TIMESTAMPTZ")
     private OffsetDateTime lastLoginAt;
+
+    @Column(name = "locked_at", columnDefinition = "TIMESTAMPTZ")
+    private OffsetDateTime lockedAt;
 }
 

@@ -19,30 +19,27 @@ import java.util.UUID;
 @AllArgsConstructor
 public abstract class TenantAwareEntity extends BaseEntity {
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "tenant_id", nullable = false, updatable = false)
     private UUID tenantId;
-
-    protected static <T extends TenantAwareEntity> T create(UUID tenantId, Class<T> entityClass) {
-        try {
-            T entity = entityClass.getDeclaredConstructor().newInstance();
-            entity.setTenantId(tenantId);
-            return entity;
-        } catch (Exception e) {
-            throw new RuntimeException("Reflection failed for " + entityClass.getName(), e);
-        }
-    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         TenantAwareEntity that = (TenantAwareEntity) o;
-        return Objects.equals(getId(), that.getId());
+
+        return getId() != null && getId().equals(that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId());
+        return getClass().hashCode();
     }
 }
 

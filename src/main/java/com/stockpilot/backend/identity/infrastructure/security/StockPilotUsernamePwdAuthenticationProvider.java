@@ -1,6 +1,7 @@
 package com.stockpilot.backend.identity.infrastructure.security;
 
 import com.stockpilot.backend.identity.domain.entity.User;
+import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -44,15 +45,17 @@ public class StockPilotUsernamePwdAuthenticationProvider
             throw new BadCredentialsException("Invalid password");
         }
 
-        List<SimpleGrantedAuthority> authorities =
-                List.of(new SimpleGrantedAuthority(
-                        user.getRole().getName().name()
-                ));
+
+        CurrentUserPrincipal principal =
+                CurrentUserPrincipal.fromUser(
+                        user,
+                        Set.of(user.getRole().getName().name())
+                );
 
         return new UsernamePasswordAuthenticationToken(
-                user,
+                principal,
                 null,
-                authorities
+                principal.getAuthorities()
         );
     }
 

@@ -3,7 +3,10 @@ package com.stockpilot.backend.identity.domain.repository;
 import com.stockpilot.backend.identity.domain.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,7 +14,9 @@ import java.util.UUID;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends
+        JpaRepository<User, UUID>,
+        JpaSpecificationExecutor<User> {
 
     Optional<User> findByEmail(String email);
 
@@ -24,5 +29,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmailAndTenantId(@NotBlank(message = "Email is required") @Email(message = "Email should be valid") String email, UUID tenantId);
 
     boolean existsByEmailAndTenantId(@NotBlank @Email String email, UUID tenantId);
+    Optional<User> findByIdAndTenantId(
+            UUID id,
+            UUID tenantId
+    );
+
+    Page<User> findByTenantId(
+            UUID tenantId,
+            Pageable pageable
+    );
 }
 

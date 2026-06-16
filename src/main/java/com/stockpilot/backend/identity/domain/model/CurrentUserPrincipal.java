@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSession implements UserDetails, Serializable {
+public class CurrentUserPrincipal implements UserDetails, Serializable {
 
-    private static final long serialVersionUID = 1L; // Essential for caching/Redis
+    private static final long serialVersionUID = 1L;
 
     private UUID id;
     private UUID tenantId;
@@ -27,34 +27,58 @@ public class UserSession implements UserDetails, Serializable {
     private String password;
 
     private Set<String> permissions;
+
     private boolean enabled;
 
-    public static UserSession fromUser(User user, Set<String> permissions) {
-        return UserSession.builder()
+    private boolean locked;
+
+    public static CurrentUserPrincipal fromUser(
+            User user,
+            Set<String> permissions
+    ) {
+        return CurrentUserPrincipal.builder()
                 .id(user.getId())
                 .tenantId(user.getTenantId())
                 .email(user.getEmail())
                 .password(user.getPasswordHash())
                 .permissions(permissions)
-                .enabled(user.getActive())
+                .enabled(Boolean.TRUE.equals(user.getActive()))
+                .locked(Boolean.TRUE.equals(user.getLocked()))
                 .build();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return permissions == null ? Set.of() : permissions.stream()
+        return permissions == null
+                ? Set.of()
+                : permissions.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return email;
     }
 
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return this.enabled; }
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 }
 

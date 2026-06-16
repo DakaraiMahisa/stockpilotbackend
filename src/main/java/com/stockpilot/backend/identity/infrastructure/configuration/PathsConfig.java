@@ -18,6 +18,7 @@ public class PathsConfig {
                 "/api/v1/auth/logout/public",
                 "/api/v1/auth/forgot-password/public",
                 "/api/v1/auth/reset-password/public",
+                "/api/v1/users",
                 "/api/csrf-token/public",
                 "/actuator/health",
                 "/error",
@@ -33,7 +34,7 @@ public class PathsConfig {
     @Bean(name = "securedPaths")
     public List<String> securedPaths() {
         return List.of(
-                "/api/**"
+                "/api/v1/users/**"
         );
     }
 
