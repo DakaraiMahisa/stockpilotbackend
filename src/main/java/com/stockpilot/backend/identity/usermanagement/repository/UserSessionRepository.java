@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -42,4 +43,11 @@ public interface UserSessionRepository extends JpaRepository<UserSession, UUID> 
             UUID tenantId,
             OffsetDateTime revokedAt
     );
+
+    List<UserSession> findByUserIdAndTenantIdAndRevokedFalseAndExpiresAtAfter(
+            UUID userId,
+            UUID tenantId,
+            Instant now
+    );
+
 }

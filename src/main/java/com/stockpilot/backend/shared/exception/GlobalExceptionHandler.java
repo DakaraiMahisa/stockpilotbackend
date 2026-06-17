@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,5 +178,20 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.validationError(errorList));
     }
 
-    
+    @ExceptionHandler(SelfDeactivationNotAllowedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleSelfDeactivation(
+            SelfDeactivationNotAllowedException ex
+    ) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserAlreadyActiveException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUserAlreadyActive(
+            UserAlreadyActiveException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
 }
