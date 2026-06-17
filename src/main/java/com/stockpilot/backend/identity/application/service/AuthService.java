@@ -7,6 +7,8 @@ import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.events.UserRegisteredEvent;
+import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
+import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.events.LoginSuccessEvent;
@@ -28,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -44,6 +47,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RoleProvisioningService roleProvisioningService;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserSessionRepository userSessionRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final TenantCodeGenerator tenantCodeGenerator;
 
@@ -166,7 +170,11 @@ public class AuthService {
 
         String accessToken = jwtService.generateAccessToken(currentUserPrincipal);
         RefreshToken refreshToken = createAndPersistRefreshToken(user, request.getDeviceInfo());
-
+        persistUserSession(
+                user,
+                refreshToken,
+                request
+        );
         eventPublisher.publishEvent(new LoginSuccessEvent(this, currentUserPrincipal));
 
         return TokenResponse.builder()
@@ -195,5 +203,34 @@ public class AuthService {
         refreshToken.setDeviceInfo(deviceInfo);
 
         return refreshTokenRepository.save(refreshToken);
+    }
+
+    private void persistUserSession(
+            User user,
+            RefreshToken refreshToken,
+            LoginRequest request
+    ) {
+
+        UserSession session = new UserSession();
+
+        session.setTenantId(user.getTenantId());
+
+        session.setUserId(user.getId());
+
+        session.setRefreshTokenHash(
+                passwordEncoder.encode(refreshToken.getToken())
+        );
+
+        session.setUserAgent(request.getDeviceInfo());
+
+        session.setLastUsedAt(Instant.now());
+
+        session.setExpiresAt(
+                refreshToken.getExpiryDate().toInstant()
+        );
+
+        session.setRevoked(false);
+
+        userSessionRepository.save(session);
     }
 }
