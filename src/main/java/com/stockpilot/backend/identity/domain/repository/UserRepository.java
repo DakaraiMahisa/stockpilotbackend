@@ -1,5 +1,6 @@
 package com.stockpilot.backend.identity.domain.repository;
 
+import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -38,5 +39,6 @@ public interface UserRepository extends
             UUID tenantId,
             Pageable pageable
     );
+
 }
 

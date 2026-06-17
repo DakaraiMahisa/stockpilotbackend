@@ -5,6 +5,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 import java.time.Instant;
 import java.util.UUID;
 @Entity
@@ -15,6 +18,11 @@ import java.util.UUID;
                 @Index(name = "idx_invite_user", columnList = "user_id")
         }
 )
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InvitationToken extends TenantAwareEntity {
 
     @Column(name = "user_id", nullable = false)

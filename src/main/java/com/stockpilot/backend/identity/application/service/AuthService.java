@@ -1,14 +1,19 @@
 package com.stockpilot.backend.identity.application.service;
 
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
+import com.stockpilot.backend.identity.application.dto.AcceptInvitationRequestDto;
 import com.stockpilot.backend.identity.application.dto.LoginRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.events.UserRegisteredEvent;
+import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
+import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
+import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
+import com.stockpilot.backend.shared.exception.*;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.events.LoginSuccessEvent;
@@ -18,11 +23,8 @@ import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.tenant.domain.repository.TenantRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
-import com.stockpilot.backend.shared.exception.AccountDisabledException;
-import com.stockpilot.backend.shared.exception.DuplicateResourceException;
-import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
-import com.stockpilot.backend.shared.exception.ResourceNotFoundException;
 import com.stockpilot.backend.tenant.service.TenantCodeGenerator;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -48,6 +50,7 @@ public class AuthService {
     private final RoleProvisioningService roleProvisioningService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserSessionRepository userSessionRepository;
+    private final InvitationTokenRepository invitationTokenRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final TenantCodeGenerator tenantCodeGenerator;
 
@@ -232,5 +235,46 @@ public class AuthService {
         session.setRevoked(false);
 
         userSessionRepository.save(session);
+    }
+
+    @Transactional
+    public void acceptInvitation(
+            AcceptInvitationRequestDto request
+    ) {
+
+        InvitationToken invitationToken =
+                invitationTokenRepository
+                        .findByUsedFalseAndExpiresAtAfter(Instant.now())
+                        .stream()
+                        .filter(token -> passwordEncoder.matches(
+                                request.token(),
+                                token.getTokenHash()
+                        ))
+                        .findFirst()
+                        .orElseThrow(InvalidInvitationTokenException::new);
+
+        User user = userRepository.findById(invitationToken.getUserId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found"));
+
+        if (user.getStatus() != UserStatus.INVITED) {
+            throw new BusinessRuleException(
+                    "User invitation is no longer valid"
+            );
+        }
+
+        user.setPasswordHash(
+                passwordEncoder.encode(request.password())
+        );
+
+        user.setEmailVerified(true);
+        user.setActive(true);
+        user.setStatus(UserStatus.ACTIVE);
+
+        invitationToken.setUsed(true);
+        invitationToken.setUsedAt(Instant.now());
+
+        userRepository.save(user);
+        invitationTokenRepository.save(invitationToken);
     }
 }

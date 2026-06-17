@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<p>Hello <span th:text="${firstName}">User</span>,</p>
+
+<p>
+    You have been invited to join StockPilot.
+</p>
+
+<p>
+    Click the button below to activate your account and set your password.
+</p>
+
+<p>
+    <a th:href="${invitationUrl}">
+        Accept Invitation
+    </a>
+</p>
+
+<p>
+    This invitation will expire in 7 days.
+</p>
+
+<p>
+    If you were not expecting this invitation, you can safely ignore this email.
+</p>
+</body>
+</html>

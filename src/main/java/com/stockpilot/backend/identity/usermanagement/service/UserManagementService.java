@@ -1,27 +1,34 @@
 package com.stockpilot.backend.identity.usermanagement.service;
 
 import com.stockpilot.backend.identity.domain.entity.Permission;
+import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
+import com.stockpilot.backend.identity.domain.enums.RoleName;
+import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
-import com.stockpilot.backend.identity.usermanagement.dto.UserDetailsDto;
-import com.stockpilot.backend.identity.usermanagement.dto.UserSessionDto;
-import com.stockpilot.backend.identity.usermanagement.dto.UserSummaryDto;
+import com.stockpilot.backend.identity.usermanagement.dto.*;
+import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
+import com.stockpilot.backend.identity.usermanagement.events.RoleChangedEvent;
+import com.stockpilot.backend.identity.usermanagement.events.UserInvitedEvent;
+import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.identity.usermanagement.specifications.UserSpecifications;
-import com.stockpilot.backend.shared.exception.SelfDeactivationNotAllowedException;
-import com.stockpilot.backend.shared.exception.UserAlreadyActiveException;
+import com.stockpilot.backend.shared.exception.*;
 import com.stockpilot.backend.shared.utils.CurrentUserContext;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -35,7 +42,11 @@ public class UserManagementService {
 
     private final UserRepository userRepository;
     private final UserSessionRepository userSessionRepository;
+    private final RoleRepository roleRepository;
+    private final InvitationTokenRepository invitationTokenRepository;
     private final CurrentUserContext currentUserContext;
+    private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Page<UserSummaryDto> listUsers(
             UUID roleId,
@@ -209,5 +220,136 @@ public class UserManagementService {
         user.setStatus(UserStatus.ACTIVE);
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void inviteUser(InviteUserRequestDto request) {
+
+        UUID tenantId = currentUserContext.getCurrentTenantId();
+
+        if (userRepository.existsByEmailAndTenantId(
+                request.email(),
+                tenantId
+        )) {
+            throw new DuplicateResourceException("User already exists");
+        }
+
+        Role role = roleRepository.findById(request.roleId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Role not found"));
+
+        if (role.getName() == RoleName.OWNER) {
+            throw new BusinessRuleException(
+                    "OWNER role cannot be assigned"
+            );
+        }
+
+        User user = User.builder()
+                .tenantId(tenantId)
+                .email(request.email())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .passwordHash(
+                        passwordEncoder.encode(
+                                UUID.randomUUID().toString()
+                        )
+                )
+                .role(role)
+                .status(UserStatus.INVITED)
+                .active(false)
+                .emailVerified(false)
+                .mfaEnabled(false)
+                .build();
+
+        user = userRepository.save(user);
+
+        GeneratedInvitationToken generated =
+                createInvitationToken(user);
+
+        invitationTokenRepository.save(generated.entity());
+
+        eventPublisher.publishEvent(
+                new UserInvitedEvent(user)
+        );
+    }
+
+    private GeneratedInvitationToken createInvitationToken(User user) {
+
+        String rawToken = UUID.randomUUID().toString();
+
+        InvitationToken token = new InvitationToken();
+
+        token.setTenantId(user.getTenantId());
+        token.setUserId(user.getId());
+        token.setTokenHash(passwordEncoder.encode(rawToken));
+        token.setExpiresAt(Instant.now().plus(7, ChronoUnit.DAYS));
+
+        return new GeneratedInvitationToken(rawToken, token);
+    }
+
+    @Transactional
+    public void changeUserRole(
+            UUID userId,
+            ChangeUserRoleRequestDto request
+    ) {
+
+        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID currentUserId = currentUserContext.getCurrentUserId();
+
+        User user = userRepository.findByIdAndTenantId(
+                userId,
+                tenantId
+        ).orElseThrow(() ->
+                new EntityNotFoundException("User not found"));
+
+        if (user.getId().equals(currentUserId)) {
+            throw new SelfRoleChangeNotAllowedException();
+        }
+
+        Role role = roleRepository.findById(request.roleId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Role not found"));
+
+        if (role.getName() == RoleName.OWNER) {
+            throw new BusinessRuleException(
+                    "OWNER role cannot be assigned"
+            );
+        }
+
+        if (user.getRole().getId().equals(role.getId())) {
+            throw new UserAlreadyHasRoleException();
+        }
+
+        Role previousRole = user.getRole();
+
+        user.setRole(role);
+
+        userRepository.save(user);
+
+        List<UserSession> sessions =
+                userSessionRepository.findByUserIdAndTenantIdAndRevokedFalse(
+                        userId,
+                        tenantId
+                );
+
+        Instant now = Instant.now();
+
+        sessions.forEach(session -> {
+            session.setRevoked(true);
+            session.setRevokedAt(now);
+        });
+
+        userSessionRepository.saveAll(sessions);
+
+
+// Todo Task - Remember to implement event listeners during audit implementation
+        eventPublisher.publishEvent(
+                new RoleChangedEvent(
+                        user.getId(),
+                        tenantId,
+                        previousRole.getName().name(),
+                        role.getName().name()
+                )
+        );
     }
 }
