@@ -113,4 +113,68 @@ public class EmailService {
             throw new RuntimeException("Email delivery failed", ex);
         }
     }
+
+    @Async
+    public void sendInvitationEmail(
+            String to,
+            String firstName,
+            String token
+    ) {
+
+        String invitationUrl =
+                frontendUrl +
+                        "/accept-invitation?token=" +
+                        token;
+
+        Context context = new Context();
+
+        context.setVariable("firstName", firstName);
+        context.setVariable("invitationUrl", invitationUrl);
+
+        String htmlContent =
+                templateEngine.process(
+                        "invitation-email",
+                        context
+                );
+
+        try {
+
+            MimeMessage message =
+                    mailSender.createMimeMessage();
+
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(
+                            message,
+                            true,
+                            "UTF-8"
+                    );
+
+            helper.setTo(to);
+            helper.setSubject(
+                    "You're Invited to Join StockPilot"
+            );
+            helper.setText(htmlContent, true);
+            helper.setFrom(from);
+
+            mailSender.send(message);
+
+            log.info(
+                    "Invitation email sent to {}",
+                    to
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to send invitation email to {}",
+                    to,
+                    ex
+            );
+
+            throw new RuntimeException(
+                    "Email delivery failed",
+                    ex
+            );
+        }
+    }
 }

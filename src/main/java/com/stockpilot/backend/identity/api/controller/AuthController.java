@@ -73,4 +73,12 @@ public class AuthController {
         verificationService.verifyEmail(token);
         return ResponseEntity.ok(ApiResponse.success(null, "Email verified successfully. You can now log in."));
     }
+
+    @PostMapping("/accept-invitation")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void acceptInvitation(
+            @Valid @RequestBody AcceptInvitationRequestDto request
+    ) {
+        authService.acceptInvitation(request);
+    }
 }

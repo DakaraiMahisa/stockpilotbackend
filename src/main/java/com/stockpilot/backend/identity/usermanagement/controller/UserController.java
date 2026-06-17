@@ -1,9 +1,8 @@
 package com.stockpilot.backend.identity.usermanagement.controller;
 
-import com.stockpilot.backend.identity.usermanagement.dto.UserDetailsDto;
-import com.stockpilot.backend.identity.usermanagement.dto.UserSessionDto;
-import com.stockpilot.backend.identity.usermanagement.dto.UserSummaryDto;
+import com.stockpilot.backend.identity.usermanagement.dto.*;
 import com.stockpilot.backend.identity.usermanagement.service.UserManagementService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,5 +83,24 @@ public class UserController {
             @PathVariable UUID id
     ) {
         userManagementService.activateUser(id);
+    }
+
+    @PostMapping("/invite")
+    @PreAuthorize("hasRole('OWNER')")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void inviteUser(
+            @Valid @RequestBody InviteUserRequestDto request
+    ) {
+        userManagementService.inviteUser(request);
+    }
+
+    @PatchMapping("/{id}/role")
+    @PreAuthorize("hasRole('OWNER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changeUserRole(
+            @PathVariable UUID id,
+            @Valid @RequestBody ChangeUserRoleRequestDto request
+    ) {
+        userManagementService.changeUserRole(id, request);
     }
 }

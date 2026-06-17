@@ -194,4 +194,37 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.error(ex.getMessage()));
     }
+
+
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<ApiResponse<Void>> handleBusinessRuleInvariants(
+            BusinessRuleException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler({
+            InvalidInvitationTokenException.class,
+            InvitationAlreadyUsedException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleInvitationErrors(
+            RuntimeException ex
+    ) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler({
+            SelfRoleChangeNotAllowedException.class,
+            UserAlreadyHasRoleException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleRoleChangeExceptions(
+            RuntimeException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
 }
