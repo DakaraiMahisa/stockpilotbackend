@@ -1,5 +1,10 @@
 package com.stockpilot.backend.identity.usermanagement.service;
 
+import com.stockpilot.backend.identity.audits.annotations.Auditable;
+import com.stockpilot.backend.identity.audits.context.AuditMetadataContext;
+import com.stockpilot.backend.identity.audits.enums.AuditAction;
+import com.stockpilot.backend.identity.audits.enums.AuditSeverity;
+import com.stockpilot.backend.identity.audits.enums.AuditTargetEntity;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
@@ -29,10 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -145,6 +147,11 @@ public class UserManagementService {
     }
 
     @Transactional
+    @Auditable(
+            action = AuditAction.SESSION_REVOKED,
+            severity = AuditSeverity.WARNING,
+            target = AuditTargetEntity.SESSION
+    )
     public void revokeSession(UUID userId, UUID sessionId) {
 
         UUID tenantId = currentUserContext.getCurrentTenantId();
@@ -171,6 +178,11 @@ public class UserManagementService {
     }
 
     @Transactional
+    @Auditable(
+            action = AuditAction.USER_DEACTIVATED,
+            severity = AuditSeverity.WARNING,
+            target = AuditTargetEntity.USER
+    )
     public void deactivateUser(UUID userId) {
 
         UUID tenantId = currentUserContext.getCurrentTenantId();
@@ -205,6 +217,11 @@ public class UserManagementService {
     }
 
     @Transactional
+    @Auditable(
+            action = AuditAction.USER_ACTIVATED,
+            severity = AuditSeverity.WARNING,
+            target = AuditTargetEntity.USER
+    )
     public void activateUser(UUID userId) {
 
         UUID tenantId = currentUserContext.getCurrentTenantId();
@@ -223,6 +240,11 @@ public class UserManagementService {
     }
 
     @Transactional
+    @Auditable(
+            action = AuditAction.USER_INVITED,
+            severity = AuditSeverity.WARNING,
+            target = AuditTargetEntity.USER
+    )
     public void inviteUser(InviteUserRequestDto request) {
 
         UUID tenantId = currentUserContext.getCurrentTenantId();
@@ -288,6 +310,11 @@ public class UserManagementService {
     }
 
     @Transactional
+    @Auditable(
+            action = AuditAction.ROLE_CHANGED,
+            severity = AuditSeverity.CRITICAL,
+            target = AuditTargetEntity.USER
+    )
     public void changeUserRole(
             UUID userId,
             ChangeUserRoleRequestDto request
@@ -323,8 +350,15 @@ public class UserManagementService {
         Role previousRole = user.getRole();
 
         user.setRole(role);
-
         userRepository.save(user);
+
+        AuditMetadataContext.putAll(
+                Map.of(
+                        "targetId", user.getId(),
+                        "previousRole", previousRole.getName().name(),
+                        "newRole", role.getName().name()
+                )
+        );
 
         List<UserSession> sessions =
                 userSessionRepository.findByUserIdAndTenantIdAndRevokedFalse(
@@ -341,15 +375,5 @@ public class UserManagementService {
 
         userSessionRepository.saveAll(sessions);
 
-
-// Todo Task - Remember to implement event listeners during audit implementation
-        eventPublisher.publishEvent(
-                new RoleChangedEvent(
-                        user.getId(),
-                        tenantId,
-                        previousRole.getName().name(),
-                        role.getName().name()
-                )
-        );
     }
 }
