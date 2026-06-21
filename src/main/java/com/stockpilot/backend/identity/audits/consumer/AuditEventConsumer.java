@@ -5,12 +5,14 @@ import com.stockpilot.backend.identity.audits.entity.AuditEventEntity;
 import com.stockpilot.backend.identity.audits.events.AuditEvent;
 import com.stockpilot.backend.identity.audits.repository.AuditEventRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuditEventConsumer {
 
     private final AuditEventRepository repository;
@@ -37,5 +39,6 @@ public class AuditEventConsumer {
                         .build();
 
         repository.save(entity);
+
     }
 }

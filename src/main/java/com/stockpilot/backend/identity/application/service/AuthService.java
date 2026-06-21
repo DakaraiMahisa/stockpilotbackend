@@ -4,14 +4,13 @@ import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.identity.application.dto.AcceptInvitationRequestDto;
 import com.stockpilot.backend.identity.application.dto.LoginRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
-import com.stockpilot.backend.identity.audits.annotations.Auditable;
-import com.stockpilot.backend.identity.audits.enums.AuditAction;
-import com.stockpilot.backend.identity.audits.enums.AuditSeverity;
-import com.stockpilot.backend.identity.audits.enums.AuditTargetEntity;
+import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
+import com.stockpilot.backend.identity.audits.events.InvitationAcceptedEvent;
+import com.stockpilot.backend.identity.audits.events.LoginFailedEvent;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
-import com.stockpilot.backend.identity.domain.events.UserRegisteredEvent;
+import com.stockpilot.backend.identity.audits.events.UserRegisteredEvent;
 import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
@@ -20,7 +19,7 @@ import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepo
 import com.stockpilot.backend.shared.exception.*;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
-import com.stockpilot.backend.identity.domain.events.LoginSuccessEvent;
+import com.stockpilot.backend.identity.audits.events.LoginSuccessEvent;
 import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
@@ -57,6 +56,7 @@ public class AuthService {
     private final InvitationTokenRepository invitationTokenRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final TenantCodeGenerator tenantCodeGenerator;
+    private final RequestAuditContext requestContext;
 
     @Transactional
     public void registerOrganization(RegisterOrganizationRequest request) {
@@ -148,24 +148,90 @@ public class AuthService {
     @Transactional
     public TokenResponse login(LoginRequest request) {
         Tenant tenant = tenantRepository.findByCode(request.getTenantCode())
-                .orElseThrow(() ->
-                        new InvalidCredentialsException("Invalid credentials"));
+                .orElseThrow(() -> {
+
+                    eventPublisher.publishEvent(
+                            new LoginFailedEvent(
+                                    request.getTenantCode(),
+                                    request.getEmail(),
+                                    "INVALID_TENANT",
+                                    request.getDeviceInfo(),
+                                    requestContext.getClientIp()
+                            )
+                    );
+
+                    return new InvalidCredentialsException(
+                            "Invalid credentials"
+                    );
+                });
         User user = userRepository.findByEmailAndTenantId(
                         request.getEmail(),
                         tenant.getId()
                 )
                 .orElseThrow(() ->
-                        new InvalidCredentialsException("Invalid credentials"));
+                {
+
+                    eventPublisher.publishEvent(
+                            new LoginFailedEvent(
+                                    request.getTenantCode(),
+                                    request.getEmail(),
+                                    "USER_NOT_FOUND",
+                                    request.getDeviceInfo(),
+                                    requestContext.getClientIp()
+                            )
+                    );
+
+                    return new InvalidCredentialsException(
+                            "Invalid credentials"
+                    );
+                });
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsException("Invalid password");
+
+            eventPublisher.publishEvent(
+                    new LoginFailedEvent(
+                            request.getTenantCode(),
+                            request.getEmail(),
+                            "INVALID_PASSWORD",
+                            request.getDeviceInfo(),
+                            requestContext.getClientIp()
+                    )
+            );
+
+            throw new InvalidCredentialsException(
+                    "Invalid password"
+            );
         }
 
         if (!Boolean.TRUE.equals(user.getActive())) {
-            throw new AccountDisabledException("Your account has been deactivated. Please verify your email first.");
+            eventPublisher.publishEvent(
+                    new LoginFailedEvent(
+                            request.getTenantCode(),
+                            request.getEmail(),
+                            "ACCOUNT_DISABLED",
+                            request.getDeviceInfo(),
+                            requestContext.getClientIp()
+                    )
+            );
+
+            throw new AccountDisabledException(
+                    "Your account has been deactivated. Please verify your email first."
+            );
         }
 
         if (!Boolean.TRUE.equals(user.getEmailVerified())) {
-            throw new AccountDisabledException("Please verify your email before logging in.");
+            eventPublisher.publishEvent(
+                    new LoginFailedEvent(
+                            request.getTenantCode(),
+                            request.getEmail(),
+                            "EMAIL_NOT_VERIFIED",
+                            request.getDeviceInfo(),
+                            requestContext.getClientIp()
+                    )
+            );
+
+            throw new AccountDisabledException(
+                    "Please verify your email before logging in."
+            );
         }
 
         Set<String> permissions = roleRepository.findPermissionsByRoleId(user.getRole().getId());
@@ -182,8 +248,12 @@ public class AuthService {
                 refreshToken,
                 request
         );
-        eventPublisher.publishEvent(new LoginSuccessEvent(this, currentUserPrincipal));
-
+        eventPublisher.publishEvent(
+                new LoginSuccessEvent(
+                        currentUserPrincipal,
+                        request.getDeviceInfo()
+                )
+        );
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getToken())
@@ -280,5 +350,14 @@ public class AuthService {
 
         userRepository.save(user);
         invitationTokenRepository.save(invitationToken);
+        eventPublisher.publishEvent(
+                new InvitationAcceptedEvent(
+                        user.getId(),
+                        user.getTenantId(),
+                        user.getEmail(),
+                        requestContext.getClientIp(),
+                        requestContext.getUserAgent()
+                )
+        );
     }
 }

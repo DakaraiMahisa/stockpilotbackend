@@ -10,7 +10,7 @@ public class RequestAuditContext {
 
     private final HttpServletRequest request;
 
-    public String getIpAddress() {
+    public String getClientIp() {
 
         String forwarded = request.getHeader("X-Forwarded-For");
 

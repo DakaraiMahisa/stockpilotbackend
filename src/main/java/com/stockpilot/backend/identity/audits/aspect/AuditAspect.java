@@ -49,7 +49,7 @@ public class AuditAspect {
                     auditable.target(),
                     targetId,
                     metadata,
-                    requestAuditContext.getIpAddress(),
+                    requestAuditContext.getClientIp(),
                     requestAuditContext.getUserAgent(),
                     Instant.now()
             );
