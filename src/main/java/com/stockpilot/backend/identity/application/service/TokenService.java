@@ -2,6 +2,8 @@ package com.stockpilot.backend.identity.application.service;
 
 import com.stockpilot.backend.identity.application.dto.RefreshTokenRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
+import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
+import com.stockpilot.backend.identity.audits.events.TokenRotatedEvent;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
@@ -9,7 +11,9 @@ import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
+import com.stockpilot.backend.tenant.service.TenantCodeGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,8 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
     private final RoleRepository roleRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final RequestAuditContext requestContext;
 
     @Transactional
     public TokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
@@ -50,6 +56,14 @@ public class TokenService {
         String newAccessToken = jwtService.generateAccessToken(currentUserPrincipal);
         RefreshToken newRefreshToken = createAndPersistRefreshToken(user, refreshToken.getDeviceInfo());
 
+        eventPublisher.publishEvent(
+                new TokenRotatedEvent(
+                        user.getId(),
+                        user.getTenantId(),
+                        requestContext.getUserAgent(),
+                        requestContext.getClientIp()
+                )
+        );
         return TokenResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken.getToken())

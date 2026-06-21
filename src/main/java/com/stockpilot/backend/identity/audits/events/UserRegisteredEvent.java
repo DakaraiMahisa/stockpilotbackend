@@ -1,4 +1,4 @@
-package com.stockpilot.backend.identity.domain.events;
+package com.stockpilot.backend.identity.audits.events;
 
 import com.stockpilot.backend.identity.domain.entity.User;
 import lombok.Getter;

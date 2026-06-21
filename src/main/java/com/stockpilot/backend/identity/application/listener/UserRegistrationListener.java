@@ -3,7 +3,7 @@ package com.stockpilot.backend.identity.application.listener;
 import com.stockpilot.backend.identity.application.service.EmailService;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.entity.VerificationToken;
-import com.stockpilot.backend.identity.domain.events.UserRegisteredEvent;
+import com.stockpilot.backend.identity.audits.events.UserRegisteredEvent;
 import com.stockpilot.backend.identity.domain.repository.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
