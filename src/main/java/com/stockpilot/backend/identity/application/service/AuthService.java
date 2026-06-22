@@ -241,13 +241,19 @@ public class AuthService {
 
         CurrentUserPrincipal currentUserPrincipal = CurrentUserPrincipal.fromUser(user, permissions);
 
-        String accessToken = jwtService.generateAccessToken(currentUserPrincipal);
         RefreshToken refreshToken = createAndPersistRefreshToken(user, request.getDeviceInfo());
-        persistUserSession(
+        UserSession session = persistUserSession(
                 user,
                 refreshToken,
                 request
         );
+        refreshToken.setSessionId(session.getId());
+        String accessToken = jwtService.generateAccessToken(
+                currentUserPrincipal,
+                session.getId()
+        );
+
+
         eventPublisher.publishEvent(
                 new LoginSuccessEvent(
                         currentUserPrincipal,
@@ -282,7 +288,7 @@ public class AuthService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-    private void persistUserSession(
+    private UserSession persistUserSession(
             User user,
             RefreshToken refreshToken,
             LoginRequest request
@@ -308,7 +314,7 @@ public class AuthService {
 
         session.setRevoked(false);
 
-        userSessionRepository.save(session);
+       return userSessionRepository.save(session);
     }
 
     @Transactional

@@ -177,4 +177,60 @@ public class EmailService {
             );
         }
     }
+    @Async
+    public void sendPasswordChangedEmail(
+            String to,
+            String firstName
+    ) {
+
+        Context context = new Context();
+
+        context.setVariable(
+                "firstName",
+                firstName
+        );
+
+        String htmlContent = templateEngine.process(
+                "password-changed-email",
+                context
+        );
+
+        try {
+
+            MimeMessage message =
+                    mailSender.createMimeMessage();
+
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(
+                            message,
+                            true,
+                            "UTF-8"
+                    );
+
+            helper.setTo(to);
+
+            helper.setSubject(
+                    "Your StockPilot Password Has Been Changed"
+            );
+
+            helper.setText(htmlContent, true);
+
+            helper.setFrom(from);
+
+            mailSender.send(message);
+
+            log.info(
+                    "Password changed email sent to {}",
+                    to
+            );
+
+        } catch (Exception ex) {
+
+            log.error(
+                    "Failed to send password changed email to {}",
+                    to,
+                    ex
+            );
+        }
+    }
 }

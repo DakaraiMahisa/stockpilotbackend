@@ -32,29 +32,63 @@ public class TokenService {
     private final RequestAuditContext requestContext;
 
     @Transactional
-    public TokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
-        String requestRefreshToken = refreshTokenRequest.getRefreshToken();
+    public TokenResponse refreshToken(
+            RefreshTokenRequest refreshTokenRequest
+    ) {
 
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(requestRefreshToken)
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid refresh token"));
+        String requestRefreshToken =
+                refreshTokenRequest.getRefreshToken();
+
+        RefreshToken refreshToken =
+                refreshTokenRepository.findByToken(requestRefreshToken)
+                        .orElseThrow(() ->
+                                new InvalidCredentialsException(
+                                        "Invalid refresh token"
+                                ));
 
         if (refreshToken.isExpired()) {
             refreshTokenRepository.delete(refreshToken);
-            throw new InvalidCredentialsException("Refresh token has expired");
+
+            throw new InvalidCredentialsException(
+                    "Refresh token has expired"
+            );
         }
 
         User user = refreshToken.getUser();
+
         if (!user.getActive()) {
-            throw new InvalidCredentialsException("User is not active");
+            throw new InvalidCredentialsException(
+                    "User is not active"
+            );
         }
 
-        refreshTokenRepository.delete(refreshToken);
+        UUID sessionId = refreshToken.getSessionId();
 
-        Set<String> permissions = roleRepository.findPermissionsByRoleId(user.getRole().getId());
-        CurrentUserPrincipal currentUserPrincipal = CurrentUserPrincipal.fromUser(user, permissions);
+        Set<String> permissions =
+                roleRepository.findPermissionsByRoleId(
+                        user.getRole().getId()
+                );
 
-        String newAccessToken = jwtService.generateAccessToken(currentUserPrincipal);
-        RefreshToken newRefreshToken = createAndPersistRefreshToken(user, refreshToken.getDeviceInfo());
+        CurrentUserPrincipal currentUserPrincipal =
+                CurrentUserPrincipal.fromUser(
+                        user,
+                        permissions
+                );
+
+        refreshToken.setToken(UUID.randomUUID().toString());
+
+        refreshToken.setExpiryDate(
+                OffsetDateTime.now().plusDays(7)
+        );
+
+        RefreshToken updatedRefreshToken =
+                refreshTokenRepository.save(refreshToken);
+
+        String newAccessToken =
+                jwtService.generateAccessToken(
+                        currentUserPrincipal,
+                        sessionId
+                );
 
         eventPublisher.publishEvent(
                 new TokenRotatedEvent(
@@ -64,9 +98,10 @@ public class TokenService {
                         requestContext.getClientIp()
                 )
         );
+
         return TokenResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken.getToken())
+                .refreshToken(updatedRefreshToken.getToken())
                 .build();
     }
 

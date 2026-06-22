@@ -16,6 +16,7 @@ public class PathsConfig {
                 "/api/v1/auth/verify-email/public",
                 "/api/v1/auth/refresh/public",
                 "/api/v1/auth/logout/public",
+                "/api/v1/auth/logout-all/public",
                 "/api/v1/auth/forgot-password/public",
                 "/api/v1/auth/reset-password/public",
                 "/api/v1/auth/accept-invitation",

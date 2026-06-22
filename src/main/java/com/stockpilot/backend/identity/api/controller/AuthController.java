@@ -52,7 +52,14 @@ public class AuthController {
     @PostMapping("/logout/public")
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        sessionService.revoke(authHeader);
+        sessionService.logout(authHeader);
+        return ResponseEntity.ok(ApiResponse.success(null, "Logged out successfully"));
+    }
+
+    @PostMapping("/logout-all/public")
+    public ResponseEntity<ApiResponse<Void>> logoutAllDevices(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        sessionService.logoutAllDevices(authHeader);
         return ResponseEntity.ok(ApiResponse.success(null, "Logged out successfully"));
     }
 

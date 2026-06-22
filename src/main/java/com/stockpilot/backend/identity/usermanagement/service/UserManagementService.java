@@ -5,6 +5,7 @@ import com.stockpilot.backend.identity.audits.context.AuditMetadataContext;
 import com.stockpilot.backend.identity.audits.enums.AuditAction;
 import com.stockpilot.backend.identity.audits.enums.AuditSeverity;
 import com.stockpilot.backend.identity.audits.enums.AuditTargetEntity;
+import com.stockpilot.backend.identity.audits.enums.SessionRevocationReason;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
@@ -170,7 +171,13 @@ public class UserManagementService {
         if (session.isRevoked()) {
             return;
         }
-
+        AuditMetadataContext.putAll(
+                Map.of(
+                        "reason", SessionRevocationReason.ADMIN_SESSION_REVOKE.name(),
+                        "sessionId", sessionId.toString(),
+                        "targetUserId", userId.toString()
+                )
+        );
         session.setRevoked(true);
         session.setRevokedAt(Instant.now());
 

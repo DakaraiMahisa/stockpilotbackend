@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Aspect
@@ -36,9 +37,18 @@ public class AuditAspect {
             Object result = joinPoint.proceed();
 
             Map<String, Object> metadata =
-                    AuditMetadataContext.get();
+                    Optional.ofNullable(AuditMetadataContext.get())
+                            .orElseGet(Map::of);
 
-            UUID targetId = (UUID) metadata.get("targetId");
+            UUID targetId = null;
+
+            Object targetIdValue = metadata.get("targetId");
+
+            if (targetIdValue instanceof UUID uuid) {
+                targetId = uuid;
+            } else if (targetIdValue instanceof String value) {
+                targetId = UUID.fromString(value);
+            }
 
             AuditEvent event = new AuditEvent(
                     UUID.randomUUID(),
