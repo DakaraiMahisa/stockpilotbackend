@@ -27,12 +27,13 @@ public class JwtService {
 
     private static final String CLAIM_TENANT_ID = "tenantId";
     private static final String CLAIM_PERMISSIONS = "permissions";
+    private static final String CLAIM_SESSION_ID = "sessionId";
     private static final int TOKEN_EXPIRY_MINUTES = 15;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    public String generateAccessToken(CurrentUserPrincipal currentUserPrincipal) {
+    public String generateAccessToken(CurrentUserPrincipal currentUserPrincipal,UUID sessionId) {
         Instant now = Instant.now();
         Instant expiryTime = now.plus(TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES);
 
@@ -42,6 +43,7 @@ public class JwtService {
                     .subject(currentUserPrincipal.getUsername())
                     .claim("user_id", currentUserPrincipal.getId().toString())
                     .claim(CLAIM_TENANT_ID, currentUserPrincipal.getTenantId().toString())
+                    .claim(CLAIM_SESSION_ID, sessionId.toString())
                     .claim(CLAIM_PERMISSIONS, currentUserPrincipal.getPermissions()) // List of Strings
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(expiryTime))
@@ -127,10 +129,28 @@ public class JwtService {
         return CurrentUserPrincipal.builder()
                 .id(UUID.fromString(claims.get("user_id", String.class)))
                 .tenantId(UUID.fromString(claims.get(CLAIM_TENANT_ID, String.class)))
+                .sessionId(UUID.fromString(claims.get(CLAIM_SESSION_ID, String.class)))
                 .email(claims.getSubject())
                 .permissions(new HashSet<>(claims.get(CLAIM_PERMISSIONS, List.class)))
                 .enabled(true)
                 .build();
+    }
+    public UUID extractSessionId(String token) {
+
+        Claims claims = getClaimsFromToken(token);
+
+        String sessionId = claims.get(
+                CLAIM_SESSION_ID,
+                String.class
+        );
+
+        if (sessionId == null) {
+            throw new InvalidTokenException(
+                    "Session ID claim not found"
+            );
+        }
+
+        return UUID.fromString(sessionId);
     }
 
     private Claims getClaimsFromToken(String token) {

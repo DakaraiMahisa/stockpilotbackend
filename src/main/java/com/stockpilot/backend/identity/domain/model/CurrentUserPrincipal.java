@@ -21,6 +21,7 @@ public class CurrentUserPrincipal implements UserDetails, Serializable {
 
     private UUID id;
     private UUID tenantId;
+    private UUID sessionId;
     private String email;
 
     @ToString.Exclude
