@@ -1,4 +1,4 @@
-package com.stockpilot.backend.identity.infrastructure.security;
+package com.stockpilot.backend.identity.infrastructure.security.csrf;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.csrf.CsrfToken;
