@@ -89,12 +89,22 @@ public class UserManagementService {
     public UserDetailsDto getUser(UUID userId) {
 
         UUID tenantId = currentUserContext.getCurrentTenantId();
+        return toUserDetailsDto(
+                getUserOrThrow(userId, tenantId)
+        );
+    }
+    @Transactional(readOnly = true)
+    public UserDetailsDto getCurrentUser() {
 
-        User user = userRepository.findByIdAndTenantId(userId, tenantId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "User not found"
-                ));
+        return toUserDetailsDto(
+                getUserOrThrow(
+                        currentUserContext.getCurrentUserId(),
+                        currentUserContext.getCurrentTenantId()
+                )
+        );
+    }
 
+    private UserDetailsDto toUserDetailsDto(User user) {
         Set<String> permissions = user.getRole()
                 .getPermissions()
                 .stream()
@@ -117,6 +127,11 @@ public class UserManagementService {
         );
     }
 
+    private User getUserOrThrow(UUID userId, UUID tenantId) {
+        return userRepository.findByIdAndTenantId(userId, tenantId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found"));
+    }
     @Transactional(readOnly = true)
     public List<UserSessionDto> getUserSessions(UUID userId) {
 
