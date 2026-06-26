@@ -214,7 +214,7 @@ public class AuthService {
             );
 
             throw new AccountDisabledException(
-                    "Your account has been deactivated. Please verify your email first."
+                    "Your account has been deactivated. Please contact your administrator."
             );
         }
 
