@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -30,17 +30,17 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "session_id")
     private UUID sessionId;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "token", nullable = false, unique = true, length = 255)
     private String token;
 
     @Column(name = "expiry_date", nullable = false)
-    private OffsetDateTime expiryDate;
+    private Instant expiryDate;
 
     @Column(name = "device_info", columnDefinition = "TEXT")
     private String deviceInfo;
 
     public boolean isExpired() {
-        return expiryDate.isBefore(OffsetDateTime.now());
+        return expiryDate.isBefore(Instant.now());
     }
 }
 

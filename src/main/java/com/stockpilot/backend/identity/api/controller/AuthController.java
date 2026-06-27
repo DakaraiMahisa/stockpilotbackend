@@ -3,6 +3,7 @@ package com.stockpilot.backend.identity.api.controller;
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.identity.application.dto.*;
 import com.stockpilot.backend.identity.application.service.*;
+import com.stockpilot.backend.identity.domain.enums.VerificationResult;
 import com.stockpilot.backend.shared.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -77,8 +78,21 @@ public class AuthController {
 
     @GetMapping("/verify-email/public")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(@RequestParam("token") String token) {
-        verificationService.verifyEmail(token);
-        return ResponseEntity.ok(ApiResponse.success(null, "Email verified successfully. You can now log in."));
+        VerificationResult result =verificationService.verifyEmail(token);
+
+        String message = switch (result) {
+            case VERIFIED ->
+                    "Email verified successfully. You can now log in.";
+
+            case ALREADY_VERIFIED ->
+                    "Your email has already been verified. You can log in.";
+
+            default ->
+                    throw new IllegalStateException();
+        };
+        return ResponseEntity.ok(
+                ApiResponse.success(null, message)
+        );
     }
 
     @PostMapping("/accept-invitation")

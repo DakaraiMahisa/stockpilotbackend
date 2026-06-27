@@ -11,7 +11,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Component
@@ -31,7 +32,7 @@ public class UserRegistrationListener {
         VerificationToken verificationToken = VerificationToken.builder()
                 .token(token)
                 .user(user)
-                .expiryDate(OffsetDateTime.now().plusHours(24))
+                .expiryDate(Instant.now().plus(24, ChronoUnit.HOURS))
                 .build();
 
         tokenRepository.save(verificationToken);

@@ -11,13 +11,13 @@ import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
-import com.stockpilot.backend.tenant.service.TenantCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.UUID;
 
@@ -78,7 +78,7 @@ public class TokenService {
         refreshToken.setToken(UUID.randomUUID().toString());
 
         refreshToken.setExpiryDate(
-                OffsetDateTime.now().plusDays(7)
+                Instant.now().plus(7, ChronoUnit.DAYS)
         );
 
         RefreshToken updatedRefreshToken =
@@ -121,7 +121,7 @@ public class TokenService {
 
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(
-                OffsetDateTime.now().plusDays(7)
+                Instant.now().plus(7, ChronoUnit.DAYS)
         );
         refreshToken.setDeviceInfo(deviceInfo);
 

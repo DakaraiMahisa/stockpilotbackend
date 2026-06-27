@@ -16,7 +16,6 @@ import com.stockpilot.backend.identity.usermanagement.dto.*;
 import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
-import com.stockpilot.backend.identity.usermanagement.events.RoleChangedEvent;
 import com.stockpilot.backend.identity.usermanagement.events.UserInvitedEvent;
 import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
