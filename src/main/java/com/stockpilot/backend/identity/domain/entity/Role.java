@@ -32,8 +32,8 @@ import java.util.Set;
 @AllArgsConstructor
 public class Role extends TenantAwareEntity {
 
-    @Column(name = "name", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "name", length = 50, nullable = false)
     private RoleName name;
 
     @ManyToMany

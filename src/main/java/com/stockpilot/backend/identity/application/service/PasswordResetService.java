@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
@@ -45,7 +45,7 @@ public class PasswordResetService {
             PasswordResetToken passwordResetToken = PasswordResetToken.builder()
                     .token(token)
                     .user(user)
-                    .expiryDate(OffsetDateTime.now().plusHours(1))
+                    .expiryDate(Instant.now().plus(1, ChronoUnit.HOURS))
                     .build();
             passwordResetTokenRepository.save(passwordResetToken);
 
@@ -63,7 +63,7 @@ public class PasswordResetService {
             throw new InvalidCredentialsException("Password reset token has already been used");
         }
 
-        if (passwordResetToken.getExpiryDate().isBefore(OffsetDateTime.now())) {
+        if (passwordResetToken.getExpiryDate().isBefore(Instant.now())) {
             throw new InvalidCredentialsException("Password reset token has expired");
         }
 

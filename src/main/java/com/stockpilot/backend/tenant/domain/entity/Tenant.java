@@ -29,7 +29,6 @@ public class Tenant extends BaseEntity {
     @Column(name = "legal_name", length = 200)
     private String legalName;
 
-
     @Column(name = "email", length = 150)
     private String email;
 
@@ -43,13 +42,11 @@ public class Tenant extends BaseEntity {
     @Builder.Default
     private String timezone = "Asia/Kolkata";
 
-
     @Column(name = "currency_code", nullable = false, length = 10)
     @Builder.Default
     private String currencyCode = "INR";
 
-
     @Column(name = "active", nullable = false)
     @Builder.Default
-    private Boolean active = true;
+    private boolean active = true;
 }

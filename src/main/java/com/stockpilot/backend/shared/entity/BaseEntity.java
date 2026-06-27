@@ -6,16 +6,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,21 +28,26 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "uuid DEFAULT gen_random_uuid()", nullable = false, updatable = false)
+    @Column(
+            columnDefinition = "uuid DEFAULT gen_random_uuid()",
+            nullable = false,
+            updatable = false
+    )
     private UUID id;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @UpdateTimestamp
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Version
     @Column(nullable = false)
     private Long version;
 
-    @Column(name="deleted",nullable = false)
+    @Column(nullable = false)
+    @Builder.Default
     private boolean deleted = false;
 }

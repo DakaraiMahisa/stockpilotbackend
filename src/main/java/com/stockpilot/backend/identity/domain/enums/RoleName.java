@@ -9,6 +9,8 @@ public enum RoleName {
 
     INVENTORY_CLERK,
 
-    ACCOUNTANT
+    ACCOUNTANT,
+
+    EMPLOYEE
 }
 

@@ -2,7 +2,7 @@ package com.stockpilot.backend.identity.usermanagement.dto;
 
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record UserSummaryDto(
@@ -13,6 +13,6 @@ public record UserSummaryDto(
         String role,
         UserStatus status,
         Boolean active,
-        OffsetDateTime lastLoginAt
+        Instant lastLoginAt
 ) {
 }

@@ -2,8 +2,7 @@ package com.stockpilot.backend.identity.usermanagement.dto;
 
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,7 +17,7 @@ public record UserDetailsDto(
         Boolean active,
         Boolean emailVerified,
         Boolean mfaEnabled,
-        OffsetDateTime lastLoginAt,
-        LocalDateTime createdAt
+        Instant lastLoginAt,
+        Instant createdAt
 ) {
 }

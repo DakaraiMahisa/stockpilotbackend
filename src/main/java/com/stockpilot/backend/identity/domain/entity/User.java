@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -50,47 +50,38 @@ public class User extends TenantAwareEntity {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(name = "active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+    @Column(name = "active", nullable = false)
     @Builder.Default
     private Boolean active = true;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            name = "status",
-            nullable = false,
-            length = 20,
-            columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'"
-    )
+    @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
-    @Column(name = "locked", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "locked", nullable = false)
     @Builder.Default
     private Boolean locked = false;
 
-    @Column(
-            name = "failed_login_attempts",
-            nullable = false,
-            columnDefinition = "INTEGER DEFAULT 0"
-    )
+    @Column(name = "failed_login_attempts", nullable = false)
     @Builder.Default
     private Integer failedLoginAttempts = 0;
 
-    @Column(name = "email_verified", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "email_verified", nullable = false)
     @Builder.Default
     private Boolean emailVerified = false;
 
-    @Column(name = "mfa_enabled", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "mfa_enabled", nullable = false)
     @Builder.Default
     private Boolean mfaEnabled = false;
 
     @Column(name = "invited_at", columnDefinition = "TIMESTAMPTZ")
-    private OffsetDateTime invitedAt;
+    private Instant invitedAt;
 
     @Column(name = "last_login_at", columnDefinition = "TIMESTAMPTZ")
-    private OffsetDateTime lastLoginAt;
+    private Instant lastLoginAt;
 
     @Column(name = "locked_at", columnDefinition = "TIMESTAMPTZ")
-    private OffsetDateTime lockedAt;
+    private Instant lockedAt;
 }
 

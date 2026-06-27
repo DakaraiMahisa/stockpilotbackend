@@ -2,13 +2,10 @@ package com.stockpilot.backend.identity.domain.entity;
 
 import com.stockpilot.backend.shared.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "password_reset_tokens")
@@ -19,7 +16,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 public class PasswordResetToken extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "token", nullable = false, unique = true, length = 255)
     private String token;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,9 +24,13 @@ public class PasswordResetToken extends BaseEntity {
     private User user;
 
     @Column(name = "expiry_date", nullable = false)
-    private OffsetDateTime expiryDate;
+    private Instant expiryDate;
 
-    @Column(nullable = false)
+    @Column(name = "used", nullable = false)
+    @Builder.Default
     private boolean used = false;
-}
 
+    public boolean isExpired() {
+        return expiryDate.isBefore(Instant.now());
+    }
+}
