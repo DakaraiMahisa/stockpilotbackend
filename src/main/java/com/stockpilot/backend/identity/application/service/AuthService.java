@@ -7,7 +7,6 @@ import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
 import com.stockpilot.backend.identity.audits.events.InvitationAcceptedEvent;
 import com.stockpilot.backend.identity.audits.events.LoginFailedEvent;
-import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
@@ -39,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -57,7 +55,6 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserSessionRepository userSessionRepository;
     private final InvitationTokenRepository invitationTokenRepository;
-    private final PermissionRepository permissionRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final TenantCodeGenerator tenantCodeGenerator;
     private final RequestAuditContext requestContext;

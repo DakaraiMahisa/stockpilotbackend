@@ -8,8 +8,8 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -23,19 +23,19 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
     private static final String CLAIM_TENANT_ID = "tenantId";
     private static final String CLAIM_PERMISSIONS = "permissions";
     private static final String CLAIM_SESSION_ID = "sessionId";
-    private static final int TOKEN_EXPIRY_MINUTES = 15;
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private final JwtProperties jwtProperties;
+
 
     public String generateAccessToken(CurrentUserPrincipal currentUserPrincipal,UUID sessionId) {
         Instant now = Instant.now();
-        Instant expiryTime = now.plus(TOKEN_EXPIRY_MINUTES, ChronoUnit.MINUTES);
+        Instant expiryTime = now.plus(jwtProperties.expiration());
 
         try {
             return Jwts.builder()
@@ -162,7 +162,7 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.secret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
