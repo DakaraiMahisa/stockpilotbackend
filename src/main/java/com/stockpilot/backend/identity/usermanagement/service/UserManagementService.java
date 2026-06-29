@@ -21,7 +21,7 @@ import com.stockpilot.backend.identity.usermanagement.repository.InvitationToken
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.identity.usermanagement.specifications.UserSpecifications;
 import com.stockpilot.backend.shared.exception.*;
-import com.stockpilot.backend.shared.utils.CurrentUserContext;
+import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,7 +46,7 @@ public class UserManagementService {
     private final UserSessionRepository userSessionRepository;
     private final RoleRepository roleRepository;
     private final InvitationTokenRepository invitationTokenRepository;
-    private final CurrentUserContext currentUserContext;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -56,7 +56,7 @@ public class UserManagementService {
             Pageable pageable
     ) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         Specification<User> specification =
                 Specification.allOf(
@@ -87,7 +87,7 @@ public class UserManagementService {
     @Transactional(readOnly = true)
     public UserDetailsDto getUser(UUID userId) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
         return toUserDetailsDto(
                 getUserOrThrow(userId, tenantId)
         );
@@ -97,8 +97,8 @@ public class UserManagementService {
 
         return toUserDetailsDto(
                 getUserOrThrow(
-                        currentUserContext.getCurrentUserId(),
-                        currentUserContext.getCurrentTenantId()
+                        authenticatedUserProvider.getCurrentUserId(),
+                        authenticatedUserProvider.getCurrentTenantId()
                 )
         );
     }
@@ -134,7 +134,7 @@ public class UserManagementService {
     @Transactional(readOnly = true)
     public List<UserSessionDto> getUserSessions(UUID userId) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         userRepository.findByIdAndTenantId(userId, tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -169,7 +169,7 @@ public class UserManagementService {
     )
     public void revokeSession(UUID userId, UUID sessionId) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         userRepository.findByIdAndTenantId(userId, tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -206,8 +206,8 @@ public class UserManagementService {
     )
     public void deactivateUser(UUID userId) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
-        UUID currentUserId = currentUserContext.getCurrentUserId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+        UUID currentUserId = authenticatedUserProvider.getCurrentUserId();
 
         User user = userRepository.findByIdAndTenantId(userId, tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -245,7 +245,7 @@ public class UserManagementService {
     )
     public void activateUser(UUID userId) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         User user = userRepository.findByIdAndTenantId(userId, tenantId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -268,7 +268,7 @@ public class UserManagementService {
     )
     public void inviteUser(InviteUserRequestDto request) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         if (userRepository.existsByEmailAndTenantId(
                 request.email(),
@@ -341,8 +341,8 @@ public class UserManagementService {
             ChangeUserRoleRequestDto request
     ) {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
-        UUID currentUserId = currentUserContext.getCurrentUserId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+        UUID currentUserId = authenticatedUserProvider.getCurrentUserId();
 
         User user = userRepository.findByIdAndTenantId(
                 userId,

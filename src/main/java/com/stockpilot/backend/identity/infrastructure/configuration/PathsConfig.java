@@ -36,7 +36,9 @@ public class PathsConfig {
     public List<String> securedPaths() {
         return List.of(
                 "/api/v1/users/**",
-                "/api/v1/roles/**"
+                "/api/v1/roles/**",
+                "/api/v1/org/**"
+
         );
     }
 

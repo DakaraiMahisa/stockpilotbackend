@@ -8,7 +8,7 @@ import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.shared.exception.InvalidTokenException;
-import com.stockpilot.backend.shared.utils.CurrentUserContext;
+import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class SessionService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
 
-    private final CurrentUserContext currentUserContext;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
     private final ApplicationEventPublisher eventPublisher;
     private final RequestAuditContext requestContext;
     private final UserSessionRepository userSessionRepository;
