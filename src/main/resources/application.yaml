@@ -3,8 +3,8 @@ spring:
     name: backend
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/stockpilot}
-    username: ${DB_USER:stockpilot}
-    password: ${DB_PASSWORD:stockpilot}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -68,11 +68,33 @@ app:
     secret: ${JWT_SECRET}
     expiration: 15m
 
-  frontend:
-    url: http://localhost:5173
+  storage:
+    bucket: sme-platform
+    allowed-content-types:
+      - image/png
+      - image/jpeg
+    folders:
+      organization-logos: org-logos
+      product-images: product-images
+      documents: documents
+
+    upload:
+      presigned-url-expiry-seconds: 300
+      max-logo-size-bytes: 2097152
 
   mail:
     from: ${EMAIL_USER}
+
+  frontend:
+    url: http://localhost:5173
+
+
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ROOT_USER}
+  secret-key: ${MINIO_ROOT_PASSWORD}
+
+
 logging:
   level:
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR

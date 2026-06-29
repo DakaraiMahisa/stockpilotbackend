@@ -2,7 +2,8 @@ package com.stockpilot.backend.identity.usermanagement.controller;
 
 import com.stockpilot.backend.identity.usermanagement.dto.*;
 import com.stockpilot.backend.identity.usermanagement.service.UserManagementService;
-import com.stockpilot.backend.shared.dto.ApiResponse;
+import com.stockpilot.backend.shared.api.ApiResponse;
+import com.stockpilot.backend.shared.api.ApiRoutes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping(ApiRoutes.USERS)
 @RequiredArgsConstructor
 public class UserController {
 

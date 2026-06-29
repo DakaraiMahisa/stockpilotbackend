@@ -11,12 +11,12 @@ import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.audits.events.UserRegisteredEvent;
-import com.stockpilot.backend.identity.domain.repository.PermissionRepository;
 import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
 import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
+import com.stockpilot.backend.org.service.OrganizationProvisioningService;
 import com.stockpilot.backend.shared.exception.*;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
@@ -52,6 +52,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RoleProvisioningService roleProvisioningService;
+    private final OrganizationProvisioningService organizationProvisioningService;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserSessionRepository userSessionRepository;
     private final InvitationTokenRepository invitationTokenRepository;
@@ -101,6 +102,10 @@ public class AuthService {
 
         tenant = tenantRepository.save(tenant);
 
+        organizationProvisioningService.provisionDefaults(
+                tenant,
+                request
+        );
         // Create default tenant roles
         roleProvisioningService.provisionDefaultRoles(
                 tenant.getId()

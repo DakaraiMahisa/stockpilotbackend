@@ -18,6 +18,8 @@ import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
+import com.stockpilot.backend.org.entity.Organization;
+import com.stockpilot.backend.org.service.OrganizationProvisioningService;
 import com.stockpilot.backend.shared.exception.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.ResourceNotFoundException;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
@@ -65,6 +67,9 @@ public class AuthServiceTest {
 
     @Mock
     private RoleProvisioningService roleProvisioningService;
+
+    @Mock
+    private OrganizationProvisioningService organizationProvisioningService;
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -123,7 +128,8 @@ public class AuthServiceTest {
 
             when(tenantRepository.save(any(Tenant.class)))
                     .thenReturn(savedTenant);
-
+            doNothing().when(organizationProvisioningService)
+                    .provisionDefaults(any(Tenant.class), any(RegisterOrganizationRequest.class));
             when(roleRepository.findByNameAndTenantId(
                     RoleName.OWNER,
                     tenantId))
@@ -159,6 +165,22 @@ public class AuthServiceTest {
             assertThat(persistedTenant.isActive())
                     .isTrue();
 
+            verify(organizationProvisioningService)
+                    .provisionDefaults(
+                            tenantCaptor.capture(),
+                            eq(request)
+                    );
+
+            Tenant provisionedTenant = tenantCaptor.getValue();
+
+            assertThat(provisionedTenant.getId())
+                    .isEqualTo(tenantId);
+
+            assertThat(provisionedTenant.getName())
+                    .isEqualTo(request.getOrganizationName());
+
+            assertThat(provisionedTenant.getCode())
+                    .isEqualTo("STOCKPILOT");
 
             verify(roleProvisioningService)
                     .provisionDefaultRoles(tenantId);
@@ -213,6 +235,7 @@ public class AuthServiceTest {
 
             InOrder inOrder = inOrder(
                     tenantRepository,
+                    organizationProvisioningService,
                     roleProvisioningService,
                     roleRepository,
                     userRepository,
@@ -221,6 +244,9 @@ public class AuthServiceTest {
 
             inOrder.verify(tenantRepository)
                     .save(any(Tenant.class));
+
+            inOrder.verify(organizationProvisioningService)
+                    .provisionDefaults(any(Tenant.class), eq(request));
 
             inOrder.verify(roleProvisioningService)
                     .provisionDefaultRoles(tenantId);
@@ -236,6 +262,7 @@ public class AuthServiceTest {
 
             verifyNoMoreInteractions(
                     tenantRepository,
+                    organizationProvisioningService,
                     roleRepository,
                     userRepository,
                     roleProvisioningService,

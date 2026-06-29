@@ -6,10 +6,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Component
-public class CurrentUserContext {
+public class AuthenticatedUserProvider {
 
     public CurrentUserPrincipal getCurrentUser() {
 
@@ -34,5 +35,17 @@ public class CurrentUserContext {
 
     public UUID getCurrentTenantId() {
         return getCurrentUser().getTenantId();
+    }
+
+    public UUID getCurrentSessionId() {
+        return getCurrentUser().getSessionId();
+    }
+
+    public String getCurrentUserEmail() {
+        return getCurrentUser().getEmail();
+    }
+
+    public Set<String> getCurrentPermissions() {
+        return getCurrentUser().getPermissions();
     }
 }

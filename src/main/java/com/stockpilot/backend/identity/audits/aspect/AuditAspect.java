@@ -5,7 +5,7 @@ import com.stockpilot.backend.identity.audits.context.AuditMetadataContext;
 import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
 import com.stockpilot.backend.identity.audits.events.AuditEvent;
 import com.stockpilot.backend.identity.audits.publisher.AuditEventPublisher;
-import com.stockpilot.backend.shared.utils.CurrentUserContext;
+import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuditAspect {
 
-    private final CurrentUserContext currentUserContext;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
     private final RequestAuditContext requestAuditContext;
     private final AuditEventPublisher auditEventPublisher;
 
@@ -52,8 +52,8 @@ public class AuditAspect {
 
             AuditEvent event = new AuditEvent(
                     UUID.randomUUID(),
-                    currentUserContext.getCurrentUserId(),
-                    currentUserContext.getCurrentTenantId(),
+                    authenticatedUserProvider.getCurrentUserId(),
+                    authenticatedUserProvider.getCurrentTenantId(),
                     auditable.action(),
                     auditable.severity(),
                     auditable.target(),

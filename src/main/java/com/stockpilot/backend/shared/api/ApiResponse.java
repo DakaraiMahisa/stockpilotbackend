@@ -1,4 +1,4 @@
-package com.stockpilot.backend.shared.dto;
+package com.stockpilot.backend.shared.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

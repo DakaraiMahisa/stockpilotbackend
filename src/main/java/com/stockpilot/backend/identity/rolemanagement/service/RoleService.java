@@ -2,7 +2,7 @@ package com.stockpilot.backend.identity.rolemanagement.service;
 
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.rolemanagement.dto.RoleSummaryDto;
-import com.stockpilot.backend.shared.utils.CurrentUserContext;
+import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +15,12 @@ import java.util.UUID;
 public class RoleService {
 
     private final RoleRepository roleRepository;
-    private final CurrentUserContext currentUserContext;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
 
     @Transactional(readOnly = true)
     public List<RoleSummaryDto> listRoles() {
 
-        UUID tenantId = currentUserContext.getCurrentTenantId();
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         return roleRepository.findByTenantId(tenantId)
                 .stream()

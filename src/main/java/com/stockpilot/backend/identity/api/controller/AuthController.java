@@ -4,7 +4,8 @@ import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.identity.application.dto.*;
 import com.stockpilot.backend.identity.application.service.*;
 import com.stockpilot.backend.identity.domain.enums.VerificationResult;
-import com.stockpilot.backend.shared.dto.ApiResponse;
+import com.stockpilot.backend.shared.api.ApiResponse;
+import com.stockpilot.backend.shared.api.ApiRoutes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping(ApiRoutes.AUTH)
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
