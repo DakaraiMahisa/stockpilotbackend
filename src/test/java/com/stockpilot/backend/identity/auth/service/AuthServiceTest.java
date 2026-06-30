@@ -269,433 +269,434 @@ public class AuthServiceTest {
                     eventPublisher
             );
         }
-    }
 
-    @Test
-    @DisplayName("Should throw when email already exists")
-    void shouldThrowWhenEmailAlreadyExists() {
 
+        @Test
+        @DisplayName("Should throw when email already exists")
+        void shouldThrowWhenEmailAlreadyExists() {
 
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withDefaults()
-                        .build();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(true);
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withDefaults()
+                            .build();
 
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(true);
 
-        assertThatThrownBy(() ->
-                authService.registerOrganization(request)
-        )
-                .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage(
-                        "User with email " + request.getEmail() + " already exists."
-                );
 
-        verify(userRepository)
-                .existsByEmail(request.getEmail());
+            assertThatThrownBy(() ->
+                    authService.registerOrganization(request)
+            )
+                    .isInstanceOf(DuplicateResourceException.class)
+                    .hasMessage(
+                            "User with email " + request.getEmail() + " already exists."
+                    );
 
+            verify(userRepository)
+                    .existsByEmail(request.getEmail());
 
-        verifyNoInteractions(
-                tenantCodeGenerator,
-                tenantRepository,
-                roleProvisioningService,
-                roleRepository,
-                passwordEncoder,
-                eventPublisher
-        );
 
-        verify(userRepository, never())
-                .save(any(User.class));
-    }
+            verifyNoInteractions(
+                    tenantCodeGenerator,
+                    tenantRepository,
+                    roleProvisioningService,
+                    roleRepository,
+                    passwordEncoder,
+                    eventPublisher
+            );
 
-    @Test
-    @DisplayName("Should generate unique tenant code when duplicate exists")
-    void shouldGenerateUniqueTenantCodeWhenDuplicateExists() {
+            verify(userRepository, never())
+                    .save(any(User.class));
+        }
 
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withDefaults()
-                        .organizationName("StockPilot")
-                        .build();
+        @Test
+        @DisplayName("Should generate unique tenant code when duplicate exists")
+        void shouldGenerateUniqueTenantCodeWhenDuplicateExists() {
 
-        UUID tenantId = UUID.randomUUID();
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withDefaults()
+                            .organizationName("StockPilot")
+                            .build();
 
-        Tenant savedTenant = TenantBuilder.aTenant()
-                .id(tenantId)
-                .name(request.getOrganizationName())
-                .code("STOCKPILOT-1")
-                .build();
+            UUID tenantId = UUID.randomUUID();
 
-        Role ownerRole = RoleBuilder.ownerRole()
-                .tenantId(tenantId)
-                .build();
+            Tenant savedTenant = TenantBuilder.aTenant()
+                    .id(tenantId)
+                    .name(request.getOrganizationName())
+                    .code("STOCKPILOT-1")
+                    .build();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
+            Role ownerRole = RoleBuilder.ownerRole()
+                    .tenantId(tenantId)
+                    .build();
 
-        when(tenantCodeGenerator.generate(request.getOrganizationName()))
-                .thenReturn("STOCKPILOT");
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(false);
 
-        when(tenantRepository.existsByCode("STOCKPILOT"))
-                .thenReturn(true);
+            when(tenantCodeGenerator.generate(request.getOrganizationName()))
+                    .thenReturn("STOCKPILOT");
 
-        when(tenantRepository.existsByCode("STOCKPILOT-1"))
-                .thenReturn(false);
+            when(tenantRepository.existsByCode("STOCKPILOT"))
+                    .thenReturn(true);
 
-        when(tenantRepository.save(any(Tenant.class)))
-                .thenReturn(savedTenant);
+            when(tenantRepository.existsByCode("STOCKPILOT-1"))
+                    .thenReturn(false);
 
-        when(roleRepository.findByNameAndTenantId(
-                RoleName.OWNER,
-                tenantId))
-                .thenReturn(Optional.of(ownerRole));
+            when(tenantRepository.save(any(Tenant.class)))
+                    .thenReturn(savedTenant);
 
-        when(passwordEncoder.encode(anyString()))
-                .thenReturn("encoded-password");
+            when(roleRepository.findByNameAndTenantId(
+                    RoleName.OWNER,
+                    tenantId))
+                    .thenReturn(Optional.of(ownerRole));
 
-        authService.registerOrganization(request);
+            when(passwordEncoder.encode(anyString()))
+                    .thenReturn("encoded-password");
 
+            authService.registerOrganization(request);
 
-        ArgumentCaptor<Tenant> tenantCaptor =
-                ArgumentCaptor.forClass(Tenant.class);
 
-        verify(tenantRepository)
-                .save(tenantCaptor.capture());
+            ArgumentCaptor<Tenant> tenantCaptor =
+                    ArgumentCaptor.forClass(Tenant.class);
 
-        Tenant persistedTenant =
-                tenantCaptor.getValue();
+            verify(tenantRepository)
+                    .save(tenantCaptor.capture());
 
-        assertThat(persistedTenant.getCode())
-                .isEqualTo("STOCKPILOT-1");
+            Tenant persistedTenant =
+                    tenantCaptor.getValue();
 
-        verify(tenantRepository)
-                .existsByCode("STOCKPILOT");
+            assertThat(persistedTenant.getCode())
+                    .isEqualTo("STOCKPILOT-1");
 
-        verify(tenantRepository)
-                .existsByCode("STOCKPILOT-1");
-    }
+            verify(tenantRepository)
+                    .existsByCode("STOCKPILOT");
 
-    @Test
-    @DisplayName("Should apply default timezone when not provided")
-    void shouldApplyDefaultTimezoneWhenNotProvided() {
+            verify(tenantRepository)
+                    .existsByCode("STOCKPILOT-1");
+        }
 
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withoutOptionalFields()
-                        .build();
+        @Test
+        @DisplayName("Should apply default timezone when not provided")
+        void shouldApplyDefaultTimezoneWhenNotProvided() {
 
-        UUID tenantId = UUID.randomUUID();
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withoutOptionalFields()
+                            .build();
 
-        Tenant savedTenant = TenantBuilder.aTenant()
-                .id(tenantId)
-                .timezone("Asia/Kolkata")
-                .currencyCode("INR")
-                .build();
+            UUID tenantId = UUID.randomUUID();
 
-        Role ownerRole = RoleBuilder.ownerRole()
-                .tenantId(tenantId)
-                .build();
+            Tenant savedTenant = TenantBuilder.aTenant()
+                    .id(tenantId)
+                    .timezone("Asia/Kolkata")
+                    .currencyCode("INR")
+                    .build();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
+            Role ownerRole = RoleBuilder.ownerRole()
+                    .tenantId(tenantId)
+                    .build();
 
-        when(tenantCodeGenerator.generate(request.getOrganizationName()))
-                .thenReturn("STOCKPILOT");
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(false);
 
-        when(tenantRepository.existsByCode("STOCKPILOT"))
-                .thenReturn(false);
+            when(tenantCodeGenerator.generate(request.getOrganizationName()))
+                    .thenReturn("STOCKPILOT");
 
-        when(tenantRepository.save(any(Tenant.class)))
-                .thenReturn(savedTenant);
+            when(tenantRepository.existsByCode("STOCKPILOT"))
+                    .thenReturn(false);
 
-        when(roleRepository.findByNameAndTenantId(
-                RoleName.OWNER,
-                tenantId))
-                .thenReturn(Optional.of(ownerRole));
+            when(tenantRepository.save(any(Tenant.class)))
+                    .thenReturn(savedTenant);
 
-        when(passwordEncoder.encode(anyString()))
-                .thenReturn("encoded-password");
+            when(roleRepository.findByNameAndTenantId(
+                    RoleName.OWNER,
+                    tenantId))
+                    .thenReturn(Optional.of(ownerRole));
 
+            when(passwordEncoder.encode(anyString()))
+                    .thenReturn("encoded-password");
 
-        authService.registerOrganization(request);
 
-        ArgumentCaptor<Tenant> tenantCaptor =
-                ArgumentCaptor.forClass(Tenant.class);
+            authService.registerOrganization(request);
 
-        verify(tenantRepository)
-                .save(tenantCaptor.capture());
+            ArgumentCaptor<Tenant> tenantCaptor =
+                    ArgumentCaptor.forClass(Tenant.class);
 
-        Tenant persistedTenant =
-                tenantCaptor.getValue();
+            verify(tenantRepository)
+                    .save(tenantCaptor.capture());
 
-        assertThat(persistedTenant.getTimezone())
-                .isEqualTo("Asia/Kolkata");
-    }
+            Tenant persistedTenant =
+                    tenantCaptor.getValue();
 
-    @Test
-    @DisplayName("Should apply default currency when not provided")
-    void shouldApplyDefaultCurrencyWhenNotProvided() {
+            assertThat(persistedTenant.getTimezone())
+                    .isEqualTo("Asia/Kolkata");
+        }
 
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withoutOptionalFields()
-                        .build();
+        @Test
+        @DisplayName("Should apply default currency when not provided")
+        void shouldApplyDefaultCurrencyWhenNotProvided() {
 
-        UUID tenantId = UUID.randomUUID();
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withoutOptionalFields()
+                            .build();
 
-        Tenant savedTenant = TenantBuilder.aTenant()
-                .id(tenantId)
-                .timezone("Asia/Kolkata")
-                .currencyCode("INR")
-                .build();
+            UUID tenantId = UUID.randomUUID();
 
-        Role ownerRole = RoleBuilder.ownerRole()
-                .tenantId(tenantId)
-                .build();
+            Tenant savedTenant = TenantBuilder.aTenant()
+                    .id(tenantId)
+                    .timezone("Asia/Kolkata")
+                    .currencyCode("INR")
+                    .build();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
+            Role ownerRole = RoleBuilder.ownerRole()
+                    .tenantId(tenantId)
+                    .build();
 
-        when(tenantCodeGenerator.generate(request.getOrganizationName()))
-                .thenReturn("STOCKPILOT");
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(false);
 
-        when(tenantRepository.existsByCode("STOCKPILOT"))
-                .thenReturn(false);
+            when(tenantCodeGenerator.generate(request.getOrganizationName()))
+                    .thenReturn("STOCKPILOT");
 
-        when(tenantRepository.save(any(Tenant.class)))
-                .thenReturn(savedTenant);
+            when(tenantRepository.existsByCode("STOCKPILOT"))
+                    .thenReturn(false);
 
-        when(roleRepository.findByNameAndTenantId(
-                RoleName.OWNER,
-                tenantId))
-                .thenReturn(Optional.of(ownerRole));
+            when(tenantRepository.save(any(Tenant.class)))
+                    .thenReturn(savedTenant);
 
-        when(passwordEncoder.encode(anyString()))
-                .thenReturn("encoded-password");
+            when(roleRepository.findByNameAndTenantId(
+                    RoleName.OWNER,
+                    tenantId))
+                    .thenReturn(Optional.of(ownerRole));
 
+            when(passwordEncoder.encode(anyString()))
+                    .thenReturn("encoded-password");
 
-        authService.registerOrganization(request);
 
-        ArgumentCaptor<Tenant> tenantCaptor =
-                ArgumentCaptor.forClass(Tenant.class);
+            authService.registerOrganization(request);
 
-        verify(tenantRepository)
-                .save(tenantCaptor.capture());
+            ArgumentCaptor<Tenant> tenantCaptor =
+                    ArgumentCaptor.forClass(Tenant.class);
 
-        Tenant persistedTenant = tenantCaptor.getValue();
+            verify(tenantRepository)
+                    .save(tenantCaptor.capture());
 
-        assertThat(persistedTenant.getCurrencyCode())
-                .isEqualTo("INR");
-    }
+            Tenant persistedTenant = tenantCaptor.getValue();
 
-    @Test
-    @DisplayName("Should throw when OWNER role does not exist")
-    void shouldThrowWhenOwnerRoleDoesNotExist() {
+            assertThat(persistedTenant.getCurrencyCode())
+                    .isEqualTo("INR");
+        }
 
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withDefaults()
-                        .build();
+        @Test
+        @DisplayName("Should throw when OWNER role does not exist")
+        void shouldThrowWhenOwnerRoleDoesNotExist() {
 
-        UUID tenantId = UUID.randomUUID();
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withDefaults()
+                            .build();
 
-        Tenant savedTenant = TenantBuilder.aTenant()
-                .id(tenantId)
-                .build();
+            UUID tenantId = UUID.randomUUID();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
+            Tenant savedTenant = TenantBuilder.aTenant()
+                    .id(tenantId)
+                    .build();
 
-        when(tenantCodeGenerator.generate(request.getOrganizationName()))
-                .thenReturn("STOCKPILOT");
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(false);
 
-        when(tenantRepository.existsByCode("STOCKPILOT"))
-                .thenReturn(false);
+            when(tenantCodeGenerator.generate(request.getOrganizationName()))
+                    .thenReturn("STOCKPILOT");
 
-        when(tenantRepository.save(any(Tenant.class)))
-                .thenReturn(savedTenant);
+            when(tenantRepository.existsByCode("STOCKPILOT"))
+                    .thenReturn(false);
 
-        when(roleRepository.findByNameAndTenantId(
-                RoleName.OWNER,
-                tenantId
-        )).thenReturn(Optional.empty());
+            when(tenantRepository.save(any(Tenant.class)))
+                    .thenReturn(savedTenant);
 
-        assertThatThrownBy(() ->
-                authService.registerOrganization(request)
-        )
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("OWNER role not found for tenant.");
+            when(roleRepository.findByNameAndTenantId(
+                    RoleName.OWNER,
+                    tenantId
+            )).thenReturn(Optional.empty());
 
-        verify(roleProvisioningService)
-                .provisionDefaultRoles(tenantId);
+            assertThatThrownBy(() ->
+                    authService.registerOrganization(request)
+            )
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessage("OWNER role not found for tenant.");
 
-        verify(roleRepository)
-                .findByNameAndTenantId(
-                        RoleName.OWNER,
-                        tenantId
-                );
+            verify(roleProvisioningService)
+                    .provisionDefaultRoles(tenantId);
 
+            verify(roleRepository)
+                    .findByNameAndTenantId(
+                            RoleName.OWNER,
+                            tenantId
+                    );
 
-        verify(userRepository, never())
-                .save(any(User.class));
 
-        verify(passwordEncoder, never())
-                .encode(anyString());
+            verify(userRepository, never())
+                    .save(any(User.class));
 
-        verifyNoInteractions(eventPublisher);
-    }
+            verify(passwordEncoder, never())
+                    .encode(anyString());
 
-    @Test
-    @DisplayName("Should encode password before saving user")
-    void shouldEncodePasswordBeforeSavingUser() {
+            verifyNoInteractions(eventPublisher);
+        }
 
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withDefaults()
-                        .password("Password@123")
-                        .build();
+        @Test
+        @DisplayName("Should encode password before saving user")
+        void shouldEncodePasswordBeforeSavingUser() {
 
-        UUID tenantId = UUID.randomUUID();
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withDefaults()
+                            .password("Password@123")
+                            .build();
 
-        Tenant savedTenant = TenantBuilder.aTenant()
-                .id(tenantId)
-                .build();
+            UUID tenantId = UUID.randomUUID();
 
-        Role ownerRole = RoleBuilder.ownerRole()
-                .tenantId(tenantId)
-                .build();
+            Tenant savedTenant = TenantBuilder.aTenant()
+                    .id(tenantId)
+                    .build();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
+            Role ownerRole = RoleBuilder.ownerRole()
+                    .tenantId(tenantId)
+                    .build();
 
-        when(tenantCodeGenerator.generate(request.getOrganizationName()))
-                .thenReturn("STOCKPILOT");
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(false);
 
-        when(tenantRepository.existsByCode("STOCKPILOT"))
-                .thenReturn(false);
+            when(tenantCodeGenerator.generate(request.getOrganizationName()))
+                    .thenReturn("STOCKPILOT");
 
-        when(tenantRepository.save(any(Tenant.class)))
-                .thenReturn(savedTenant);
+            when(tenantRepository.existsByCode("STOCKPILOT"))
+                    .thenReturn(false);
 
-        when(roleRepository.findByNameAndTenantId(
-                RoleName.OWNER,
-                tenantId))
-                .thenReturn(Optional.of(ownerRole));
+            when(tenantRepository.save(any(Tenant.class)))
+                    .thenReturn(savedTenant);
 
-        when(passwordEncoder.encode(request.getPassword()))
-                .thenReturn("encoded-password");
+            when(roleRepository.findByNameAndTenantId(
+                    RoleName.OWNER,
+                    tenantId))
+                    .thenReturn(Optional.of(ownerRole));
 
-        authService.registerOrganization(request);
+            when(passwordEncoder.encode(request.getPassword()))
+                    .thenReturn("encoded-password");
 
-        verify(passwordEncoder)
-                .encode(request.getPassword());
+            authService.registerOrganization(request);
 
-        ArgumentCaptor<User> userCaptor =
-                ArgumentCaptor.forClass(User.class);
+            verify(passwordEncoder)
+                    .encode(request.getPassword());
 
-        verify(userRepository)
-                .save(userCaptor.capture());
+            ArgumentCaptor<User> userCaptor =
+                    ArgumentCaptor.forClass(User.class);
 
-        User persistedUser = userCaptor.getValue();
+            verify(userRepository)
+                    .save(userCaptor.capture());
 
-        assertThat(persistedUser.getPasswordHash())
-                .isEqualTo("encoded-password");
+            User persistedUser = userCaptor.getValue();
 
-        assertThat(persistedUser.getPasswordHash())
-                .isNotEqualTo(request.getPassword());
-    }
+            assertThat(persistedUser.getPasswordHash())
+                    .isEqualTo("encoded-password");
 
-    @Test
-    @DisplayName("Should publish UserRegisteredEvent after successful registration")
-    void shouldPublishUserRegisteredEvent() {
+            assertThat(persistedUser.getPasswordHash())
+                    .isNotEqualTo(request.getPassword());
+        }
 
-        // Arrange
-        RegisterOrganizationRequest request =
-                RegisterOrganizationRequestBuilder
-                        .withDefaults()
-                        .build();
+        @Test
+        @DisplayName("Should publish UserRegisteredEvent after successful registration")
+        void shouldPublishUserRegisteredEvent() {
 
-        UUID tenantId = UUID.randomUUID();
+            // Arrange
+            RegisterOrganizationRequest request =
+                    RegisterOrganizationRequestBuilder
+                            .withDefaults()
+                            .build();
 
-        Tenant savedTenant = TenantBuilder.aTenant()
-                .id(tenantId)
-                .build();
+            UUID tenantId = UUID.randomUUID();
 
-        Role ownerRole = RoleBuilder.ownerRole()
-                .tenantId(tenantId)
-                .build();
+            Tenant savedTenant = TenantBuilder.aTenant()
+                    .id(tenantId)
+                    .build();
 
-        when(userRepository.existsByEmail(request.getEmail()))
-                .thenReturn(false);
+            Role ownerRole = RoleBuilder.ownerRole()
+                    .tenantId(tenantId)
+                    .build();
 
-        when(tenantCodeGenerator.generate(request.getOrganizationName()))
-                .thenReturn("STOCKPILOT");
+            when(userRepository.existsByEmail(request.getEmail()))
+                    .thenReturn(false);
 
-        when(tenantRepository.existsByCode("STOCKPILOT"))
-                .thenReturn(false);
+            when(tenantCodeGenerator.generate(request.getOrganizationName()))
+                    .thenReturn("STOCKPILOT");
 
-        when(tenantRepository.save(any(Tenant.class)))
-                .thenReturn(savedTenant);
+            when(tenantRepository.existsByCode("STOCKPILOT"))
+                    .thenReturn(false);
 
-        when(roleRepository.findByNameAndTenantId(
-                RoleName.OWNER,
-                tenantId))
-                .thenReturn(Optional.of(ownerRole));
+            when(tenantRepository.save(any(Tenant.class)))
+                    .thenReturn(savedTenant);
 
-        when(passwordEncoder.encode(anyString()))
-                .thenReturn("encoded-password");
+            when(roleRepository.findByNameAndTenantId(
+                    RoleName.OWNER,
+                    tenantId))
+                    .thenReturn(Optional.of(ownerRole));
 
+            when(passwordEncoder.encode(anyString()))
+                    .thenReturn("encoded-password");
 
-        authService.registerOrganization(request);
 
+            authService.registerOrganization(request);
 
-        ArgumentCaptor<UserRegisteredEvent> eventCaptor =
-                ArgumentCaptor.forClass(UserRegisteredEvent.class);
 
-        verify(eventPublisher)
-                .publishEvent(eventCaptor.capture());
+            ArgumentCaptor<UserRegisteredEvent> eventCaptor =
+                    ArgumentCaptor.forClass(UserRegisteredEvent.class);
 
-        UserRegisteredEvent publishedEvent =
-                eventCaptor.getValue();
+            verify(eventPublisher)
+                    .publishEvent(eventCaptor.capture());
 
-        assertThat(publishedEvent)
-                .isNotNull();
+            UserRegisteredEvent publishedEvent =
+                    eventCaptor.getValue();
 
-        assertThat(publishedEvent.getSource())
-                .isEqualTo(authService);
+            assertThat(publishedEvent)
+                    .isNotNull();
 
-        User eventUser = publishedEvent.getUser();
+            assertThat(publishedEvent.getSource())
+                    .isEqualTo(authService);
 
-        assertThat(eventUser)
-                .isNotNull();
+            User eventUser = publishedEvent.getUser();
 
-        assertThat(eventUser.getTenantId())
-                .isEqualTo(tenantId);
+            assertThat(eventUser)
+                    .isNotNull();
 
-        assertThat(eventUser.getEmail())
-                .isEqualTo(request.getEmail().trim().toLowerCase());
+            assertThat(eventUser.getTenantId())
+                    .isEqualTo(tenantId);
 
-        assertThat(eventUser.getFirstName())
-                .isEqualTo(request.getFirstName());
+            assertThat(eventUser.getEmail())
+                    .isEqualTo(request.getEmail().trim().toLowerCase());
 
-        assertThat(eventUser.getLastName())
-                .isEqualTo(request.getLastName());
+            assertThat(eventUser.getFirstName())
+                    .isEqualTo(request.getFirstName());
 
-        assertThat(eventUser.getRole())
-                .isEqualTo(ownerRole);
+            assertThat(eventUser.getLastName())
+                    .isEqualTo(request.getLastName());
 
-        assertThat(eventUser.getPasswordHash())
-                .isEqualTo("encoded-password");
+            assertThat(eventUser.getRole())
+                    .isEqualTo(ownerRole);
 
-        assertThat(eventUser.getActive())
-                .isFalse();
+            assertThat(eventUser.getPasswordHash())
+                    .isEqualTo("encoded-password");
 
-        assertThat(eventUser.getEmailVerified())
-                .isFalse();
+            assertThat(eventUser.getActive())
+                    .isFalse();
 
-        assertThat(eventUser.getMfaEnabled())
-                .isFalse();
+            assertThat(eventUser.getEmailVerified())
+                    .isFalse();
+
+            assertThat(eventUser.getMfaEnabled())
+                    .isFalse();
+        }
     }
 }

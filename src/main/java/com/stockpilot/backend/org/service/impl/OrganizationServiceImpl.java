@@ -110,6 +110,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         Organization updatedOrganization = organizationRepository.save(organization);
 
+        eventPublisher.publishEvent(
+                OrganizationProfileUpdatedEvent.of(
+                        updatedOrganization.getId(),
+                        updatedOrganization.getTenantId(),
+                        authenticatedUserProvider.getCurrentUserId()
+                )
+        );
         log.info(
                 "Organization logo updated. Tenant={}, Organization={}",
                 updatedOrganization.getTenantId(),
