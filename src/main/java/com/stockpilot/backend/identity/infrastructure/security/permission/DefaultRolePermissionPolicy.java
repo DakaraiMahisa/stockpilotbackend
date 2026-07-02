@@ -82,6 +82,8 @@ public class DefaultRolePermissionPolicy {
 
         return Set.of(
 
+                "organization:read",
+
                 "users:read",
 
                 "inventory:read",
@@ -107,6 +109,8 @@ public class DefaultRolePermissionPolicy {
 
         return Set.of(
 
+                "organization:read",
+
                 "inventory:read",
 
                 "suppliers:read",
@@ -116,6 +120,9 @@ public class DefaultRolePermissionPolicy {
     }
     private Set<String> cashierPermissionCodes() {
         return Set.of(
+
+                "organization:read",
+
                 "sales:read",
                 "sales:create",
                 "customers:read"
@@ -124,6 +131,9 @@ public class DefaultRolePermissionPolicy {
 
     private Set<String> inventoryClerkPermissionCodes() {
         return Set.of(
+
+                "organization:read",
+
                 "inventory:read",
                 "inventory:update",
                 "inventory:create",
@@ -133,6 +143,9 @@ public class DefaultRolePermissionPolicy {
 
     private Set<String> accountantPermissionCodes() {
         return Set.of(
+
+                "organization:read",
+
                 "reports:read",
                 "finance:read"
         );
