@@ -1,17 +1,15 @@
 package com.stockpilot.backend.shared.storage;
 
 import com.stockpilot.backend.org.dto.PresignedUploadResponse;
+import com.stockpilot.backend.org.dto.StoredObject;
 import com.stockpilot.backend.shared.exception.StorageException;
-import io.minio.GetPresignedObjectUrlArgs;
-import io.minio.Http;
-import io.minio.MinioClient;
-import io.minio.RemoveObjectArgs;
-import io.minio.StatObjectArgs;
+import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -68,7 +66,34 @@ public class MinioStorageService implements StorageService {
             throw new StorageException("Failed to generate presigned upload URL.", ex);
         }
     }
+    @Override
+    public StoredObject getObject(String objectKey) {
+        try {
+            StatObjectResponse stat = minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(storageProperties.getBucket())
+                            .object(objectKey)
+                            .build());
 
+            InputStream inputStream = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(storageProperties.getBucket())
+                            .object(objectKey)
+                            .build());
+
+            return new StoredObject(
+                    inputStream,
+                    stat.contentType(),
+                    stat.size()
+            );
+
+        } catch (Exception ex) {
+            throw new StorageException(
+                    "Failed to retrieve object: " + objectKey,
+                    ex
+            );
+        }
+    }
     @Override
     public boolean objectExists(String objectKey) {
 

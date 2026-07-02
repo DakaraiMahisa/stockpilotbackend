@@ -6,8 +6,9 @@ import com.stockpilot.backend.org.event.OrganizationProfileUpdatedEvent;
 import com.stockpilot.backend.org.mapper.OrgMapper;
 import com.stockpilot.backend.org.repository.OrganizationRepository;
 import com.stockpilot.backend.org.service.OrganizationService;
+import com.stockpilot.backend.shared.api.ApiMessages;
 import com.stockpilot.backend.shared.exception.OrganizationNotFoundException;
-import com.stockpilot.backend.shared.exception.StorageException;
+import com.stockpilot.backend.shared.exception.ResourceNotFoundException;
 import com.stockpilot.backend.shared.exception.StorageObjectNotFoundException;
 import com.stockpilot.backend.shared.storage.StorageService;
 import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
@@ -42,6 +43,20 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         return organizationRepository.findByTenantId(tenantId)
                 .orElseThrow(() -> new OrganizationNotFoundException(tenantId));
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public StoredObject getOrganizationLogo() {
+
+        Organization organization = getCurrentOrganization();
+
+        String objectKey = organization.getLogoUrl();
+
+        if (objectKey == null || objectKey.isBlank()) {
+            throw new ResourceNotFoundException(ApiMessages.ORG_LOGO_NOT_FOUND);
+        }
+
+        return storageService.getObject(objectKey);
     }
 
     @Override

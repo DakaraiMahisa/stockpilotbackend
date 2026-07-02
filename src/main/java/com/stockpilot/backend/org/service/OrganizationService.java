@@ -5,7 +5,7 @@ import com.stockpilot.backend.org.dto.*;
 public interface OrganizationService {
 
     OrganizationDto getProfile();
-
+    StoredObject getOrganizationLogo();
     OrganizationDto updateProfile(OrganizationUpdateRequest request);
 
     PresignedUploadResponse generatePresignedUrl(

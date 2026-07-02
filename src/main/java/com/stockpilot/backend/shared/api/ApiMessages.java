@@ -13,6 +13,12 @@ public final class ApiMessages {
 
     public static final String ORG_LOGO_UPDATED =
             "Organization logo updated successfully.";
+    public static final String ORG_LOGO_RETRIEVED =
+            "Organization logo updated successfully." ;
+
+    public static final String ORG_LOGO_NOT_FOUND=
+            "Organization logo not found." ;
+
 
     private ApiMessages() {}
 }

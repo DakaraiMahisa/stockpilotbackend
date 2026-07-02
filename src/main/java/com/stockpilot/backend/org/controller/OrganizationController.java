@@ -7,6 +7,9 @@ import com.stockpilot.backend.shared.api.ApiResponse;
 import com.stockpilot.backend.shared.api.ApiRoutes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,16 @@ public class OrganizationController {
                         ApiMessages.ORG_PROFILE_RETRIEVED
                 )
         );
+    }
+    @GetMapping("/logo")
+    public ResponseEntity<Resource> getOrganizationLogo() {
+
+        StoredObject object = organizationService.getOrganizationLogo();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(object.contentType()))
+                .contentLength(object.contentLength())
+                .body(new InputStreamResource(object.inputStream()));
     }
 
     @PreAuthorize("hasRole('OWNER')")

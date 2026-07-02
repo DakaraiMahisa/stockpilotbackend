@@ -1,6 +1,7 @@
 package com.stockpilot.backend.shared.storage;
 
 import com.stockpilot.backend.org.dto.PresignedUploadResponse;
+import com.stockpilot.backend.org.dto.StoredObject;
 
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public interface StorageService {
             String filename,
             String contentType
     );
-
+    StoredObject getObject(String objectKey);
 
     boolean objectExists(String objectKey);
 
