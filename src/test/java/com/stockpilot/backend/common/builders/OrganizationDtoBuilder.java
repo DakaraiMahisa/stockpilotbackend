@@ -1,6 +1,6 @@
 package com.stockpilot.backend.common.builders;
 
-import com.stockpilot.backend.org.dto.OrganizationDto;
+import com.stockpilot.backend.org.dto.response.OrganizationDto;
 
 import java.util.UUID;
 

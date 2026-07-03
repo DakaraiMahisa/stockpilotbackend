@@ -1,7 +1,7 @@
 package com.stockpilot.backend.shared.storage;
 
-import com.stockpilot.backend.org.dto.PresignedUploadResponse;
-import com.stockpilot.backend.org.dto.StoredObject;
+import com.stockpilot.backend.org.dto.response.PresignedUploadResponse;
+import com.stockpilot.backend.org.dto.storage.StoredObject;
 
 import java.util.UUID;
 
