@@ -1,4 +1,4 @@
-package com.stockpilot.backend.org.dto;
+package com.stockpilot.backend.org.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

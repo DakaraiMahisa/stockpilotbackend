@@ -1,6 +1,6 @@
 package com.stockpilot.backend.common.builders;
 
-import com.stockpilot.backend.org.dto.LogoConfirmRequest;
+import com.stockpilot.backend.org.dto.request.LogoConfirmRequest;
 
 public class LogoConfirmRequestBuilder {
 

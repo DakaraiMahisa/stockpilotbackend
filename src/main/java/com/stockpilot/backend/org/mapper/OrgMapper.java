@@ -1,8 +1,8 @@
 package com.stockpilot.backend.org.mapper;
 
 
-import com.stockpilot.backend.org.dto.OrganizationDto;
-import com.stockpilot.backend.org.dto.OrganizationUpdateRequest;
+import com.stockpilot.backend.org.dto.response.OrganizationDto;
+import com.stockpilot.backend.org.dto.request.OrganizationUpdateRequest;
 import com.stockpilot.backend.org.entity.Organization;
 import org.mapstruct.*;
 

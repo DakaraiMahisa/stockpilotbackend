@@ -1,9 +1,11 @@
 package com.stockpilot.backend.shared.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 @Slf4j
 public class TenantContext {
     private static final ThreadLocal<UUID> currentTenant = new InheritableThreadLocal<>();

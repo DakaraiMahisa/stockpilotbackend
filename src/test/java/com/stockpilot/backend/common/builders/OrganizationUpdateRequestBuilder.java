@@ -1,6 +1,6 @@
 package com.stockpilot.backend.common.builders;
 
-import com.stockpilot.backend.org.dto.OrganizationUpdateRequest;
+import com.stockpilot.backend.org.dto.request.OrganizationUpdateRequest;
 
 public class OrganizationUpdateRequestBuilder {
 

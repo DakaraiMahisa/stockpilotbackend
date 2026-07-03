@@ -210,6 +210,22 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(InvalidOperationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidOperationException(
+            InvalidOperationException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(InactiveBranchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidBranchException(
+            InactiveBranchException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler({
             InvalidInvitationTokenException.class,
             InvitationAlreadyUsedException.class

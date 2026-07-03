@@ -1,6 +1,6 @@
 package com.stockpilot.backend.common.builders;
 
-import com.stockpilot.backend.org.dto.LogoPresignedRequest;
+import com.stockpilot.backend.org.dto.request.LogoPresignedRequest;
 
 public class LogoPresignedRequestBuilder {
 

@@ -1,7 +1,7 @@
 package com.stockpilot.backend.common.builders;
 
 
-import com.stockpilot.backend.org.dto.PresignedUploadResponse;
+import com.stockpilot.backend.org.dto.response.PresignedUploadResponse;
 
 public class PresignedUploadResponseBuilder {
 

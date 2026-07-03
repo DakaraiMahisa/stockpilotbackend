@@ -1,4 +1,4 @@
-package com.stockpilot.backend.org.dto;
+package com.stockpilot.backend.org.dto.storage;
 
 import java.io.InputStream;
 
