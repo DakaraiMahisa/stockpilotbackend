@@ -14,7 +14,7 @@ public final class ApiRoutes {
 
 
     public static final String ORGANIZATIONS = API_V1 + "/org";
-    public static final String BRANCHES = API_V1 + "/branches";
+    public static final String BRANCHES = ORGANIZATIONS + "/branches";
     public static final String BUSINESS_CONFIG = API_V1 + "/business-config";
     public static final String TAXES = API_V1 + "/taxes";
     public static final String SUBSCRIPTIONS = API_V1 + "/subscriptions";
