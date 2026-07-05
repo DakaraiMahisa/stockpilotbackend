@@ -36,7 +36,6 @@ public class BranchServiceImpl implements BranchService {
     private final BranchRepository branchRepository;
     private final UserRepository userRepository;
     private final BranchMapper branchMapper;
-    private final TenantContext tenantContext;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -257,8 +256,9 @@ public class BranchServiceImpl implements BranchService {
         User manager = userRepository
                 .findByIdAndTenantId(managerId, tenantId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Manager not found."));
-
+                        new ResourceNotFoundException(
+                                "Branch manager with ID " + managerId + " not found."
+                        ));
         if (Boolean.FALSE.equals(manager.getActive())) {
             throw new BusinessRuleException(
                     "Inactive users cannot be assigned as branch managers."
@@ -275,7 +275,9 @@ public class BranchServiceImpl implements BranchService {
         return branchRepository
                 .findByIdAndTenantIdAndDeletedFalse(branchId, tenantId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Branch not found."));
+                        new ResourceNotFoundException(
+                                "Branch with ID " + branchId + " not found."
+                        ));
     }
 
 
@@ -344,6 +346,6 @@ public class BranchServiceImpl implements BranchService {
     }
 
     private UUID getCurrentTenantId() {
-        return tenantContext.getTenantId();
+        return TenantContext.getTenantId();
     }
 }
