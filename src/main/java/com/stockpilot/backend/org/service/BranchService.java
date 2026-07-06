@@ -9,6 +9,7 @@ import com.stockpilot.backend.org.dto.response.DefaultBranchResponse;
 import com.stockpilot.backend.org.enums.BranchStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -28,6 +29,10 @@ public interface BranchService {
 
     DefaultBranchResponse setDefaultBranch(UUID branchId);
 
+    @Transactional(readOnly = true)
+    BranchDto getBranch(UUID branchId);
+
+    @Transactional(readOnly = true)
     Page<BranchDto> getBranches(
             BranchStatus status,
             Pageable pageable

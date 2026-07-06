@@ -55,6 +55,18 @@ public class BranchController {
                 .body(ApiResponse.success(branch));
     }
 
+    @GetMapping("/{branchId}")
+    @PreAuthorize("hasAnyRole('OWNER', 'MANAGER', 'STAFF')")
+    public ResponseEntity<ApiResponse<BranchDto>> getBranch(
+            @PathVariable UUID branchId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        branchService.getBranch(branchId)
+                )
+        );
+    }
+
     @PutMapping("/{branchId}")
     @PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
     public ResponseEntity<ApiResponse<BranchDto>> updateBranch(

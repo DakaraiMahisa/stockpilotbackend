@@ -247,6 +247,16 @@ public class BranchServiceImpl implements BranchService {
                 .map(branchMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public BranchDto getBranch(UUID branchId) {
+        return branchMapper.toDto(
+                getBranchOrThrow(
+                        branchId,
+                        getCurrentTenantId()
+                )
+        );
+    }
 
     private User getManagerOrThrow(
             UUID managerId,
