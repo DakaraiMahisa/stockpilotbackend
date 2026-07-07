@@ -84,6 +84,9 @@ public class DefaultRolePermissionPolicy {
 
                 "organization:read",
 
+                "branches:read",
+                "branches:update",
+
                 "users:read",
 
                 "inventory:read",
