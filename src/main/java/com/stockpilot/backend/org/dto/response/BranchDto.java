@@ -26,7 +26,6 @@ public record BranchDto(
 
         String city,
 
-        @JsonProperty("isDefault")
         boolean defaultBranch,
 
         BranchStatus status,
