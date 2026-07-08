@@ -1,8 +1,8 @@
 package com.stockpilot.backend.identity.infrastructure.security.jwt;
 
 import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
-import com.stockpilot.backend.shared.exception.InvalidTokenException;
-import com.stockpilot.backend.shared.exception.TokenGenerationException;
+import com.stockpilot.backend.identity.exception.InvalidTokenException;
+import com.stockpilot.backend.identity.exception.TokenGenerationException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;

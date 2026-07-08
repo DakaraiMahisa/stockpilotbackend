@@ -8,12 +8,12 @@ import com.stockpilot.backend.org.dto.request.OrganizationUpdateRequest;
 import com.stockpilot.backend.org.dto.response.PresignedUploadResponse;
 import com.stockpilot.backend.org.entity.Organization;
 import com.stockpilot.backend.org.event.OrganizationProfileUpdatedEvent;
-import com.stockpilot.backend.org.mapper.OrgMapper;
+import com.stockpilot.backend.org.mapper.OrganizationMapper;
 import com.stockpilot.backend.org.repository.OrganizationRepository;
 import com.stockpilot.backend.org.service.impl.OrganizationServiceImpl;
-import com.stockpilot.backend.shared.exception.OrganizationNotFoundException;
-import com.stockpilot.backend.shared.exception.StorageException;
-import com.stockpilot.backend.shared.exception.StorageObjectNotFoundException;
+import com.stockpilot.backend.org.exception.OrganizationNotFoundException;
+import com.stockpilot.backend.shared.exception.base.StorageException;
+import com.stockpilot.backend.org.exception.StorageObjectNotFoundException;
 import com.stockpilot.backend.shared.storage.StorageService;
 import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +41,7 @@ class OrganizationServiceImplTest {
     private OrganizationRepository organizationRepository;
 
     @Mock
-    private OrgMapper orgMapper;
+    private OrganizationMapper organizationMapper;
 
     @Mock
     private AuthenticatedUserProvider authenticatedUserProvider;
@@ -94,7 +94,7 @@ class OrganizationServiceImplTest {
             when(organizationRepository.findByTenantId(tenantId))
                     .thenReturn(Optional.of(organization));
 
-            when(orgMapper.toDto(organization))
+            when(organizationMapper.toDto(organization))
                     .thenReturn(organizationDto);
 
 
@@ -110,13 +110,13 @@ class OrganizationServiceImplTest {
             verify(organizationRepository)
                     .findByTenantId(tenantId);
 
-            verify(orgMapper)
+            verify(organizationMapper)
                     .toDto(organization);
 
             verifyNoMoreInteractions(
                     authenticatedUserProvider,
                     organizationRepository,
-                    orgMapper,
+                    organizationMapper,
                     storageService,
                     eventPublisher
             );
@@ -146,7 +146,7 @@ class OrganizationServiceImplTest {
             verify(organizationRepository)
                     .findByTenantId(tenantId);
 
-            verify(orgMapper, never())
+            verify(organizationMapper, never())
                     .toDto(any());
 
             verifyNoInteractions(
@@ -157,7 +157,7 @@ class OrganizationServiceImplTest {
             verifyNoMoreInteractions(
                     authenticatedUserProvider,
                     organizationRepository,
-                    orgMapper
+                    organizationMapper
             );
         }
     }
@@ -204,7 +204,7 @@ class OrganizationServiceImplTest {
             when(organizationRepository.save(organization))
                     .thenReturn(organization);
 
-            when(orgMapper.toDto(organization))
+            when(organizationMapper.toDto(organization))
                     .thenReturn(organizationDto);
 
 
@@ -221,7 +221,7 @@ class OrganizationServiceImplTest {
             verify(organizationRepository)
                     .findByTenantId(tenantId);
 
-            verify(orgMapper)
+            verify(organizationMapper)
                     .updateEntityFromRequest(request, organization);
 
             verify(organizationRepository)
@@ -247,13 +247,13 @@ class OrganizationServiceImplTest {
             assertThat(event.updatedBy())
                     .isEqualTo(userId);
 
-            verify(orgMapper)
+            verify(organizationMapper)
                     .toDto(organization);
 
             InOrder inOrder = inOrder(
                     authenticatedUserProvider,
                     organizationRepository,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher
             );
 
@@ -263,7 +263,7 @@ class OrganizationServiceImplTest {
             inOrder.verify(organizationRepository)
                     .findByTenantId(tenantId);
 
-            inOrder.verify(orgMapper)
+            inOrder.verify(organizationMapper)
                     .updateEntityFromRequest(request, organization);
 
             inOrder.verify(organizationRepository)
@@ -272,13 +272,13 @@ class OrganizationServiceImplTest {
             inOrder.verify(eventPublisher)
                     .publishEvent(any(OrganizationProfileUpdatedEvent.class));
 
-            inOrder.verify(orgMapper)
+            inOrder.verify(organizationMapper)
                     .toDto(organization);
 
             verifyNoMoreInteractions(
                     authenticatedUserProvider,
                     organizationRepository,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher,
                     storageService
             );
@@ -315,7 +315,7 @@ class OrganizationServiceImplTest {
                     .findByTenantId(tenantId);
 
             verifyNoInteractions(
-                    orgMapper,
+                    organizationMapper,
                     storageService,
                     eventPublisher
             );
@@ -376,7 +376,7 @@ class OrganizationServiceImplTest {
                     authenticatedUserProvider,
                     storageService,
                     organizationRepository,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher
             );
         }
@@ -423,7 +423,7 @@ class OrganizationServiceImplTest {
                     authenticatedUserProvider,
                     storageService,
                     organizationRepository,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher
             );
         }
@@ -469,7 +469,7 @@ class OrganizationServiceImplTest {
             when(organizationRepository.save(organization))
                     .thenReturn(organization);
 
-            when(orgMapper.toDto(organization))
+            when(organizationMapper.toDto(organization))
                     .thenReturn(response);
 
 
@@ -489,7 +489,7 @@ class OrganizationServiceImplTest {
             verify(organizationRepository)
                     .save(organization);
 
-            verify(orgMapper)
+            verify(organizationMapper)
                     .toDto(organization);
 
             ArgumentCaptor<OrganizationProfileUpdatedEvent> eventCaptor =
@@ -516,7 +516,7 @@ class OrganizationServiceImplTest {
                     organizationRepository,
                     authenticatedUserProvider,
                     storageService,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher
             );
         }
@@ -558,7 +558,7 @@ class OrganizationServiceImplTest {
             when(organizationRepository.save(organization))
                     .thenReturn(organization);
 
-            when(orgMapper.toDto(organization))
+            when(organizationMapper.toDto(organization))
                     .thenReturn(response);
 
 
@@ -578,7 +578,7 @@ class OrganizationServiceImplTest {
             verify(organizationRepository)
                     .save(organization);
 
-            verify(orgMapper)
+            verify(organizationMapper)
                     .toDto(organization);
 
             ArgumentCaptor<OrganizationProfileUpdatedEvent> eventCaptor =
@@ -605,7 +605,7 @@ class OrganizationServiceImplTest {
                     organizationRepository,
                     authenticatedUserProvider,
                     storageService,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher
             );
         }
@@ -646,14 +646,14 @@ class OrganizationServiceImplTest {
             verify(organizationRepository, never())
                     .save(any());
 
-            verify(orgMapper, never())
+            verify(organizationMapper, never())
                     .toDto(any());
 
             verifyNoMoreInteractions(
                     organizationRepository,
                     authenticatedUserProvider,
                     storageService,
-                    orgMapper,
+                    organizationMapper,
                     eventPublisher
             );
         }
@@ -699,7 +699,7 @@ class OrganizationServiceImplTest {
                 organizationRepository,
                 authenticatedUserProvider,
                 storageService,
-                orgMapper,
+                organizationMapper,
                 eventPublisher
         );
     }

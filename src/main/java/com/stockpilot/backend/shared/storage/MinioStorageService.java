@@ -2,7 +2,7 @@ package com.stockpilot.backend.shared.storage;
 
 import com.stockpilot.backend.org.dto.response.PresignedUploadResponse;
 import com.stockpilot.backend.org.dto.storage.StoredObject;
-import com.stockpilot.backend.shared.exception.StorageException;
+import com.stockpilot.backend.shared.exception.base.StorageException;
 import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,10 @@
 package com.stockpilot.backend.shared.exception;
 
+import com.stockpilot.backend.identity.exception.*;
+import com.stockpilot.backend.org.exception.InactiveBranchException;
+import com.stockpilot.backend.org.exception.InsufficientStockException;
 import com.stockpilot.backend.shared.api.ApiResponse;
+import com.stockpilot.backend.shared.exception.base.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.dao.DataIntegrityViolationException;

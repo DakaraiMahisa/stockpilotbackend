@@ -1,7 +1,9 @@
 package com.stockpilot.backend.org.service;
 
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
+import com.stockpilot.backend.org.entity.BusinessConfig;
 import com.stockpilot.backend.org.entity.Organization;
+import com.stockpilot.backend.org.repository.BusinessConfigRepository;
 import com.stockpilot.backend.org.repository.OrganizationRepository;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +15,32 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrganizationProvisioningService {
 
     private final OrganizationRepository organizationRepository;
+    private final BusinessConfigRepository businessConfigRepository;
 
     @Transactional
-    public void provisionDefaults(Tenant tenant, RegisterOrganizationRequest request) {
+    public void provisionDefaults(
+            Tenant tenant,
+            RegisterOrganizationRequest request
+    ) {
 
-        Organization organization = Organization.builder()
+        Organization organization = organizationRepository.save(
+                Organization.builder()
+                        .tenantId(tenant.getId())
+                        .legalName(request.getOrganizationName().trim())
+                        .displayName(request.getOrganizationName().trim())
+                        .email(request.getEmail().trim().toLowerCase())
+                        .countryCode("IN")
+                        .build()
+        );
+
+        BusinessConfig businessConfig = BusinessConfig.builder()
                 .tenantId(tenant.getId())
-                .legalName(request.getOrganizationName().trim())
-                .displayName(request.getOrganizationName().trim())
-                .email(request.getEmail().trim().toLowerCase())
-                .countryCode("IN")
+                .organization(organization)
                 .build();
 
-        organizationRepository.save(organization);
+        businessConfigRepository.save(businessConfig);
 
         // Future:
-        // businessConfigRepository.save(...)
         // orgSettingsRepository.save(...)
     }
 }

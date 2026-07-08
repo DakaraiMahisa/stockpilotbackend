@@ -11,8 +11,7 @@ import com.stockpilot.backend.identity.domain.repository.PasswordResetTokenRepos
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
-import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
-import lombok.AllArgsConstructor;
+import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;

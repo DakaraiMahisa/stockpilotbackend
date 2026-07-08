@@ -1,7 +1,7 @@
 package com.stockpilot.backend.aspects;
 
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
-import com.stockpilot.backend.shared.exception.RegistrationValidationException;
+import com.stockpilot.backend.identity.exception.RegistrationValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;

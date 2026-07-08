@@ -10,7 +10,7 @@ import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
-import com.stockpilot.backend.shared.exception.InvalidCredentialsException;
+import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
