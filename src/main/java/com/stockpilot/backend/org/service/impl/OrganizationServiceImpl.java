@@ -8,13 +8,13 @@ import com.stockpilot.backend.org.dto.response.PresignedUploadResponse;
 import com.stockpilot.backend.org.dto.storage.StoredObject;
 import com.stockpilot.backend.org.entity.Organization;
 import com.stockpilot.backend.org.event.OrganizationProfileUpdatedEvent;
-import com.stockpilot.backend.org.mapper.OrgMapper;
+import com.stockpilot.backend.org.mapper.OrganizationMapper;
+import com.stockpilot.backend.org.provider.OrganizationProvider;
 import com.stockpilot.backend.org.repository.OrganizationRepository;
 import com.stockpilot.backend.org.service.OrganizationService;
 import com.stockpilot.backend.shared.api.ApiMessages;
-import com.stockpilot.backend.shared.exception.OrganizationNotFoundException;
-import com.stockpilot.backend.shared.exception.ResourceNotFoundException;
-import com.stockpilot.backend.shared.exception.StorageObjectNotFoundException;
+import com.stockpilot.backend.shared.exception.base.ResourceNotFoundException;
+import com.stockpilot.backend.org.exception.StorageObjectNotFoundException;
 import com.stockpilot.backend.shared.storage.StorageService;
 import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import lombok.RequiredArgsConstructor;
@@ -32,28 +32,23 @@ import java.util.UUID;
 public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRepository organizationRepository;
-    private final OrgMapper orgMapper;
+    private final OrganizationMapper organizationMapper;
     private final AuthenticatedUserProvider authenticatedUserProvider;
     private final StorageService storageService;
     private final ApplicationEventPublisher eventPublisher;
+    private final OrganizationProvider organizationProvider;
 
     @Override
     @Transactional(readOnly = true)
     public OrganizationDto getProfile() {
-        return orgMapper.toDto(getCurrentOrganization());
+        return organizationMapper.toDto(organizationProvider.getCurrentOrganization());
     }
 
-    private Organization getCurrentOrganization() {
-        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
-
-        return organizationRepository.findByTenantId(tenantId)
-                .orElseThrow(() -> new OrganizationNotFoundException(tenantId));
-    }
     @Override
     @Transactional(readOnly = true)
     public StoredObject getOrganizationLogo() {
 
-        Organization organization = getCurrentOrganization();
+        Organization organization = organizationProvider.getCurrentOrganization();
 
         String objectKey = organization.getLogoUrl();
 
@@ -67,9 +62,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationDto updateProfile(OrganizationUpdateRequest request) {
 
-        Organization organization = getCurrentOrganization();
+        Organization organization = organizationProvider.getCurrentOrganization();
 
-        orgMapper.updateEntityFromRequest(request, organization);
+        organizationMapper.updateEntityFromRequest(request, organization);
 
         Organization updatedOrganization = organizationRepository.save(organization);
 
@@ -88,7 +83,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 authenticatedUserProvider.getCurrentUserId()
         );
 
-        return orgMapper.toDto(updatedOrganization);
+        return organizationMapper.toDto(updatedOrganization);
     }
 
     @Override
@@ -114,7 +109,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public OrganizationDto confirmLogoUpload(LogoConfirmRequest request) {
 
-        Organization organization = getCurrentOrganization();
+        Organization organization = organizationProvider.getCurrentOrganization();
 
         if (!storageService.objectExists(request.objectKey())) {
             throw new StorageObjectNotFoundException(request.objectKey());
@@ -143,7 +138,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 updatedOrganization.getId()
         );
 
-        return orgMapper.toDto(updatedOrganization);
+        return organizationMapper.toDto(updatedOrganization);
     }
 
 }

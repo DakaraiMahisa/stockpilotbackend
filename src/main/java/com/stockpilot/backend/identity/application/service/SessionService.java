@@ -7,7 +7,7 @@ import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
-import com.stockpilot.backend.shared.exception.InvalidTokenException;
+import com.stockpilot.backend.identity.exception.InvalidTokenException;
 import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
