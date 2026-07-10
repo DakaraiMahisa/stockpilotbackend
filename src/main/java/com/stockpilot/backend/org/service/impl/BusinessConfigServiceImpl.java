@@ -63,12 +63,13 @@ public class BusinessConfigServiceImpl implements BusinessConfigService {
 
         BusinessConfig updatedConfig =
                 businessConfigRepository.save(businessConfig);
+     UUID currentUserId =  authenticatedUserProvider.getCurrentUserId();
 
         eventPublisher.publishEvent(
                 BusinessConfigChangedEvent.of(
                         updatedConfig.getId(),
                         updatedConfig.getTenantId(),
-                        authenticatedUserProvider.getCurrentUserId()
+                        currentUserId
                 )
         );
 
@@ -76,7 +77,7 @@ public class BusinessConfigServiceImpl implements BusinessConfigService {
                 "Business configuration updated. Tenant={}, BusinessConfig={}, UpdatedBy={}",
                 updatedConfig.getTenantId(),
                 updatedConfig.getId(),
-                authenticatedUserProvider.getCurrentUserId()
+              currentUserId
         );
 
         return businessConfigMapper.toDto(updatedConfig);
@@ -85,11 +86,12 @@ public class BusinessConfigServiceImpl implements BusinessConfigService {
     @Transactional(readOnly = true)
     private BusinessConfig getCurrentBusinessConfig() {
 
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+
         log.debug(
                 "Loading business configuration from database. Tenant={}",
-                authenticatedUserProvider.getCurrentTenantId()
+                tenantId
         );
-        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
 
         return businessConfigRepository.findByTenantId(tenantId)
