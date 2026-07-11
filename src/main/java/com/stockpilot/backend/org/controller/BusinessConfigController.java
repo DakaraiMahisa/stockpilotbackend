@@ -19,6 +19,7 @@ public class BusinessConfigController {
 
     private final BusinessConfigService businessConfigService;
 
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BusinessConfigPermissions).READ)")
     @GetMapping
     public ResponseEntity<ApiResponse<BusinessConfigDto>> getConfiguration() {
 
@@ -30,7 +31,7 @@ public class BusinessConfigController {
         );
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BusinessConfigPermissions).UPDATE)")
     @PutMapping
     public ResponseEntity<ApiResponse<BusinessConfigDto>> updateConfiguration(
             @Valid @RequestBody BusinessConfigUpdateRequest request

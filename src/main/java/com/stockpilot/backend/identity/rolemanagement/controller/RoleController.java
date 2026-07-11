@@ -18,8 +18,10 @@ public class RoleController {
 
     private final RoleService roleService;
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.RolePermissions).READ)"
+    )
     @GetMapping
-    @PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
     public List<RoleSummaryDto> listRoles() {
         return roleService.listRoles();
     }

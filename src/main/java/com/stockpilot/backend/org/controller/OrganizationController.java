@@ -47,7 +47,7 @@ public class OrganizationController {
                 .body(new InputStreamResource(object.inputStream()));
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrganizationPermissions).UPDATE)")
     @PatchMapping("/profile")
     public ResponseEntity<ApiResponse<OrganizationDto>> updateProfile(
             @Valid @RequestBody OrganizationUpdateRequest request) {
@@ -60,7 +60,7 @@ public class OrganizationController {
         );
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrganizationPermissions).UPDATE)")
     @PostMapping("/logo/presigned")
     public ResponseEntity<ApiResponse<PresignedUploadResponse>> generatePresignedUrl(
             @Valid @RequestBody LogoPresignedRequest request) {
@@ -73,7 +73,7 @@ public class OrganizationController {
         );
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrganizationPermissions).UPDATE)")
     @PatchMapping("/logo/confirm")
     public ResponseEntity<ApiResponse<OrganizationDto>> confirmLogoUpload(
             @Valid @RequestBody LogoConfirmRequest request) {

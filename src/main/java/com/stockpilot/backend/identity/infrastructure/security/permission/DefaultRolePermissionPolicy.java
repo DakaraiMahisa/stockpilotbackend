@@ -3,6 +3,7 @@ package com.stockpilot.backend.identity.infrastructure.security.permission;
 
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
+import com.stockpilot.backend.shared.security.permissions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -82,26 +83,28 @@ public class DefaultRolePermissionPolicy {
 
         return Set.of(
 
-                "organization:read",
+                OrganizationPermissions.READ,
 
-                "branches:read",
-                "branches:update",
+                BranchPermissions.READ,
+                BranchPermissions.UPDATE,
 
-                "users:read",
+                BusinessConfigPermissions.READ,
 
-                "inventory:read",
-                "inventory:create",
-                "inventory:update",
+                UserPermissions.READ,
 
-                "suppliers:read",
-                "suppliers:create",
-                "suppliers:update",
+                InventoryPermissions.READ,
+                InventoryPermissions.UPDATE,
+                InventoryPermissions.CREATE,
 
-                "categories:read",
-                "categories:create",
-                "categories:update",
+                SupplierPermissions.READ,
+                SupplierPermissions.CREATE,
+                SupplierPermissions.UPDATE,
 
-                "reports:read"
+                CategoryPermissions.READ,
+                CategoryPermissions.CREATE,
+                CategoryPermissions.UPDATE,
+
+                ReportPermissions.READ
         );
     }
 
@@ -112,45 +115,55 @@ public class DefaultRolePermissionPolicy {
 
         return Set.of(
 
-                "organization:read",
+                OrganizationPermissions.READ,
 
-                "inventory:read",
+                BusinessConfigPermissions.READ,
 
-                "suppliers:read",
+                InventoryPermissions.READ,
 
-                "categories:read"
+                SupplierPermissions.READ,
+
+                CategoryPermissions.READ
         );
     }
     private Set<String> cashierPermissionCodes() {
         return Set.of(
 
-                "organization:read",
+                OrganizationPermissions.READ,
 
-                "sales:read",
-                "sales:create",
-                "customers:read"
+                BusinessConfigPermissions.READ,
+
+                SalesPermissions.READ,
+                SalesPermissions.CREATE,
+                CustomerPermissions.READ
         );
     }
 
     private Set<String> inventoryClerkPermissionCodes() {
         return Set.of(
 
-                "organization:read",
+                OrganizationPermissions.READ,
 
-                "inventory:read",
-                "inventory:update",
-                "inventory:create",
-                "suppliers:read"
+                BusinessConfigPermissions.READ,
+
+                InventoryPermissions.READ,
+                InventoryPermissions.UPDATE,
+                InventoryPermissions.CREATE,
+
+                SupplierPermissions.READ
         );
     }
 
     private Set<String> accountantPermissionCodes() {
         return Set.of(
 
-                "organization:read",
+                OrganizationPermissions.READ,
 
-                "reports:read",
-                "finance:read"
+                BusinessConfigPermissions.READ,
+
+
+                ReportPermissions.READ,
+                FinancePermissions.READ
         );
     }
 }

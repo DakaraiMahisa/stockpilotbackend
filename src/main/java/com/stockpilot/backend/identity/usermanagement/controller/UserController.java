@@ -24,8 +24,10 @@ public class UserController {
 
     private final UserManagementService userManagementService;
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).READ)"
+    )
     @GetMapping
-    @PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
     public ResponseEntity<ApiResponse<Page<UserSummaryDto>>> listUsers(
 
             @RequestParam(required = false)
@@ -52,8 +54,10 @@ public class UserController {
         );
     }
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).READ)"
+    )
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('OWNER', 'MANAGER')")
     public ResponseEntity<ApiResponse< UserDetailsDto>> getUser(
             @PathVariable UUID id
     ) {
@@ -71,8 +75,10 @@ public class UserController {
                         "Current user retrieved successfully."));
     }
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.SessionPermissions).READ)"
+    )
     @GetMapping("/{id}/sessions")
-    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<ApiResponse<List<UserSessionDto>>> getUserSessions(
             @PathVariable UUID id
     ) {
@@ -85,8 +91,10 @@ public class UserController {
         );
     }
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.SessionPermissions).REVOKE)"
+    )
     @DeleteMapping("/{id}/sessions/{sid}")
-    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<ApiResponse<Void>> revokeSession(
             @PathVariable UUID id,
             @PathVariable("sid") UUID sessionId
@@ -101,8 +109,10 @@ public class UserController {
     }
 
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).DEACTIVATE)"
+    )
     @PatchMapping("/{id}/deactivate")
-    @PreAuthorize("hasRole('OWNER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<ApiResponse<Void>> deactivateUser(@PathVariable UUID id) {
         userManagementService.deactivateUser(id);
@@ -115,7 +125,9 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/activate")
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).ACTIVATE)"
+    )
     public ResponseEntity<ApiResponse<Void>> activateUser(
             @PathVariable UUID id
     ) {
@@ -130,8 +142,10 @@ public class UserController {
         );
     }
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).INVITE)"
+    )
     @PostMapping("/invite")
-    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<ApiResponse<Void>> inviteUser(
             @Valid @RequestBody InviteUserRequestDto request
     ) {
@@ -147,8 +161,10 @@ public class UserController {
                 );
     }
 
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.RolePermissions).UPDATE)"
+    )
     @PatchMapping("/{id}/role")
-    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<ApiResponse<Void>> changeUserRole(
             @PathVariable UUID id,
             @Valid @RequestBody ChangeUserRoleRequestDto request
