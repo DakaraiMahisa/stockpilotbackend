@@ -18,7 +18,7 @@ import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
-import com.stockpilot.backend.org.service.OrganizationProvisioningService;
+import com.stockpilot.backend.org.service.provisioning.OrganizationProvisioningService;
 import com.stockpilot.backend.shared.exception.base.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.base.ResourceNotFoundException;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
