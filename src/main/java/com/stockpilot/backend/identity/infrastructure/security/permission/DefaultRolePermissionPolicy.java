@@ -90,6 +90,11 @@ public class DefaultRolePermissionPolicy {
 
                 BusinessConfigPermissions.READ,
 
+                TaxConfigPermissions.READ,
+                TaxConfigPermissions.CREATE,
+                TaxConfigPermissions.UPDATE,
+                TaxConfigPermissions.RESOLVE,
+
                 UserPermissions.READ,
 
                 InventoryPermissions.READ,
@@ -119,6 +124,8 @@ public class DefaultRolePermissionPolicy {
 
                 BusinessConfigPermissions.READ,
 
+                TaxConfigPermissions.READ,
+
                 InventoryPermissions.READ,
 
                 SupplierPermissions.READ,
@@ -133,6 +140,9 @@ public class DefaultRolePermissionPolicy {
 
                 BusinessConfigPermissions.READ,
 
+                TaxConfigPermissions.READ,
+                TaxConfigPermissions.RESOLVE,
+
                 SalesPermissions.READ,
                 SalesPermissions.CREATE,
                 CustomerPermissions.READ
@@ -145,6 +155,8 @@ public class DefaultRolePermissionPolicy {
                 OrganizationPermissions.READ,
 
                 BusinessConfigPermissions.READ,
+
+                TaxConfigPermissions.READ,
 
                 InventoryPermissions.READ,
                 InventoryPermissions.UPDATE,
@@ -160,7 +172,7 @@ public class DefaultRolePermissionPolicy {
                 OrganizationPermissions.READ,
 
                 BusinessConfigPermissions.READ,
-
+                TaxConfigPermissions.READ,
 
                 ReportPermissions.READ,
                 FinancePermissions.READ

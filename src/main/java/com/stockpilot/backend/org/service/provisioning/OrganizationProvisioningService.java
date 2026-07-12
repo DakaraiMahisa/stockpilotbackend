@@ -1,4 +1,4 @@
-package com.stockpilot.backend.org.service;
+package com.stockpilot.backend.org.service.provisioning;
 
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.org.entity.BusinessConfig;
@@ -16,6 +16,7 @@ public class OrganizationProvisioningService {
 
     private final OrganizationRepository organizationRepository;
     private final BusinessConfigRepository businessConfigRepository;
+    private final TaxProvisioningService taxProvisioningService;
 
     @Transactional
     public void provisionDefaults(
@@ -39,6 +40,7 @@ public class OrganizationProvisioningService {
                 .build();
 
         businessConfigRepository.save(businessConfig);
+        taxProvisioningService.provisionDefaults(tenant);
 
         // Future:
         // orgSettingsRepository.save(...)

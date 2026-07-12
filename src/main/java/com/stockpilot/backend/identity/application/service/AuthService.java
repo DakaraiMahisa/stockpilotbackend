@@ -19,7 +19,7 @@ import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
 import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
-import com.stockpilot.backend.org.service.OrganizationProvisioningService;
+import com.stockpilot.backend.org.service.provisioning.OrganizationProvisioningService;
 import com.stockpilot.backend.shared.exception.base.BusinessRuleException;
 import com.stockpilot.backend.shared.exception.base.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.base.ResourceNotFoundException;
