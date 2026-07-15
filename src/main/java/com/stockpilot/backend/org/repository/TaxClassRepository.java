@@ -38,6 +38,12 @@ public interface TaxClassRepository extends JpaRepository<TaxClass, UUID> {
 
     boolean existsByTenantIdAndDeletedFalse(UUID tenantId);
 
+    boolean existsByTenantIdAndNameIgnoreCaseAndDeletedFalseAndIdNot(
+            UUID tenantId,
+            String name,
+            UUID id
+    );
+
     Optional<TaxClass> findByTenantIdAndNameIgnoreCaseAndDeletedFalse(
             UUID tenantId,
             String name

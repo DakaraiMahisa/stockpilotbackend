@@ -276,6 +276,14 @@ public class TaxServiceImpl implements TaxService {
                 request.effectiveFrom()
         );
 
+        if (previousRate != null) {
+            previousRate.setEffectiveTo(
+                    request.effectiveFrom().minusDays(1)
+            );
+
+            taxRateRepository.save(previousRate);
+        }
+
         TaxRate taxRate = taxMapper.toEntity(request);
 
         taxRate.setTenantId(tenantId);
@@ -350,17 +358,15 @@ public class TaxServiceImpl implements TaxService {
             UUID taxClassId
     ) {
 
-        taxClassRepository
-                .findByTenantIdAndNameIgnoreCaseAndDeletedFalse(
-                        tenantId,
-                        name
-                )
-                .filter(existing ->
-                        !existing.getId().equals(taxClassId)
-                )
-                .ifPresent(existing -> {
-                    throw new DuplicateTaxClassNameException(name);
-                });
+        if (taxClassRepository.existsByTenantIdAndNameIgnoreCaseAndDeletedFalseAndIdNot(
+                tenantId,
+                name,
+                taxClassId
+        )) {
+            throw new DuplicateTaxClassNameException(
+                    "Tax class name already exists: " + name
+            );
+        }
     }
 
     private TaxClass getTaxClassOrThrow(
