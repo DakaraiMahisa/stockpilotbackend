@@ -16,6 +16,7 @@ import java.util.UUID;
 public interface TaxService {
 
     List<TaxClassDto> getTaxClasses(boolean activeOnly);
+    TaxClassDto getTaxClass(UUID id);
 
     TaxClassDto createTaxClass(CreateTaxClassRequest request);
 

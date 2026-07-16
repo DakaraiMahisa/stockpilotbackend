@@ -87,6 +87,20 @@ public class TaxServiceImpl implements TaxService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public TaxClassDto getTaxClass(UUID id) {
+
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+
+        TaxClass taxClass = getTaxClassOrThrow(
+                tenantId,
+                id
+        );
+
+        return taxMapper.toDto(taxClass);
+    }
+
+    @Override
     public TaxClassDto createTaxClass(CreateTaxClassRequest request) {
 
         UUID tenantId = authenticatedUserProvider.getCurrentTenantId();

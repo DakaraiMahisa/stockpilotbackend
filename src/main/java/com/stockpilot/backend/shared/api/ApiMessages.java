@@ -36,6 +36,9 @@ public final class ApiMessages {
     public static final String TAX_CLASSES_RETRIEVED =
             "Tax classes retrieved successfully.";
 
+    public static final String TAX_CLASS_RETRIEVED =
+            "Tax class retrieved successfully.";
+
     public static final String TAX_CLASS_CREATED =
             "Tax class created successfully.";
 

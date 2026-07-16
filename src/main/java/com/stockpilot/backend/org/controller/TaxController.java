@@ -46,6 +46,19 @@ public class TaxController {
         );
     }
 
+    @GetMapping("/classes/{id}")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).READ)")
+    public ResponseEntity<ApiResponse<TaxClassDto>> getTaxClass(
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        taxService.getTaxClass(id),
+                        ApiMessages.TAX_CLASS_RETRIEVED
+                )
+        );
+    }
+
     @PostMapping("/classes")
     @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).CREATE)")
     public ResponseEntity<ApiResponse<TaxClassDto>> createTaxClass(
