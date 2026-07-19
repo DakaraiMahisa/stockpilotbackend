@@ -5,6 +5,7 @@ import com.stockpilot.backend.org.entity.BusinessConfig;
 import com.stockpilot.backend.org.entity.Organization;
 import com.stockpilot.backend.org.repository.BusinessConfigRepository;
 import com.stockpilot.backend.org.repository.OrganizationRepository;
+import com.stockpilot.backend.org.service.SubscriptionService;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class OrganizationProvisioningService {
     private final OrganizationRepository organizationRepository;
     private final BusinessConfigRepository businessConfigRepository;
     private final TaxProvisioningService taxProvisioningService;
+    private final SubscriptionService subscriptionService;
 
     @Transactional
     public void provisionDefaults(
@@ -41,7 +43,7 @@ public class OrganizationProvisioningService {
 
         businessConfigRepository.save(businessConfig);
         taxProvisioningService.provisionDefaults(tenant);
-
+        subscriptionService.createDefaultSubscription(tenant.getId());
         // Future:
         // orgSettingsRepository.save(...)
     }
