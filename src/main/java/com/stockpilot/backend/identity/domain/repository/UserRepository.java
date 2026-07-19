@@ -38,6 +38,6 @@ public interface UserRepository extends
             UUID tenantId,
             Pageable pageable
     );
-
+    long countByTenantIdAndActiveTrue(UUID tenantId);
 }
 

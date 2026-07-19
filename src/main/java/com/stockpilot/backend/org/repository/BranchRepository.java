@@ -59,4 +59,9 @@ public interface BranchRepository extends
             UUID tenantId,
             BranchStatus status
     );
+
+    long countByTenantIdAndStatus(
+            UUID tenantId,
+            BranchStatus status
+    );
 }

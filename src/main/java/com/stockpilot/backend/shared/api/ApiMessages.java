@@ -54,6 +54,12 @@ public final class ApiMessages {
     public static final String TAX_RESOLVED =
             "Tax calculated successfully.";
 
+    public static final String SUBSCRIPTION_RETRIEVED =
+            "Subscription details retrieved successfully.";
+
+    public static final String SUBSCRIPTION_UPGRADE_REQUEST_SUBMITTED =
+            "Subscription upgrade request submitted successfully.";
+
     // ============================================================
     // FUTURE API MESSAGES
     // =================================================================

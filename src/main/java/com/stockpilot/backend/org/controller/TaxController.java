@@ -33,7 +33,7 @@ public class TaxController {
     private final TaxService taxService;
 
     @GetMapping("/classes")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).READ)")
     public ResponseEntity<ApiResponse<List<TaxClassDto>>> getTaxClasses(
             @RequestParam(defaultValue = "false") boolean activeOnly
     ) {
@@ -47,7 +47,7 @@ public class TaxController {
     }
 
     @GetMapping("/classes/{id}")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).READ)")
     public ResponseEntity<ApiResponse<TaxClassDto>> getTaxClass(
             @PathVariable UUID id
     ) {
@@ -60,7 +60,7 @@ public class TaxController {
     }
 
     @PostMapping("/classes")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).CREATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).CREATE)")
     public ResponseEntity<ApiResponse<TaxClassDto>> createTaxClass(
             @Valid @RequestBody CreateTaxClassRequest request
     ) {
@@ -76,7 +76,7 @@ public class TaxController {
     }
 
     @PutMapping("/classes/{id}")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).UPDATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).UPDATE)")
     public ResponseEntity<ApiResponse<TaxClassDto>> updateTaxClass(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateTaxClassRequest request
@@ -91,7 +91,7 @@ public class TaxController {
     }
 
     @PostMapping("/classes/{id}/rates")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).UPDATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).UPDATE)")
     public ResponseEntity<ApiResponse<TaxRateDto>> addTaxRate(
             @PathVariable UUID id,
             @Valid @RequestBody CreateTaxRateRequest request
@@ -108,7 +108,7 @@ public class TaxController {
     }
 
     @PatchMapping("/classes/{id}/default")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).SET_DEFAULT)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).SET_DEFAULT)")
     public ResponseEntity<ApiResponse<TaxClassDto>> setDefaultTaxClass(
             @PathVariable UUID id
     ) {
@@ -122,7 +122,7 @@ public class TaxController {
     }
 
     @GetMapping("/resolve")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermission).RESOLVE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.TaxConfigPermissions).RESOLVE)")
     public ResponseEntity<ApiResponse<TaxBreakdownDto>> resolveTax(
             @RequestParam UUID taxClassId,
             @RequestParam BigDecimal amount,
