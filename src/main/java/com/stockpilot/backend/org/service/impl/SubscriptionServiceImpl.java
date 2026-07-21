@@ -2,6 +2,7 @@ package com.stockpilot.backend.org.service.impl;
 
 import com.stockpilot.backend.org.dto.request.SubscriptionUpgradeRequest;
 import com.stockpilot.backend.org.dto.response.SubscriptionDto;
+import com.stockpilot.backend.org.dto.response.SubscriptionUsageDto;
 import com.stockpilot.backend.org.dto.response.UpgradeRequestResponse;
 import com.stockpilot.backend.org.entity.Subscription;
 import com.stockpilot.backend.org.enums.PlanCode;
@@ -10,6 +11,7 @@ import com.stockpilot.backend.org.event.UpgradeRequestedEvent;
 import com.stockpilot.backend.org.mapper.SubscriptionMapper;
 import com.stockpilot.backend.org.repository.SubscriptionRepository;
 import com.stockpilot.backend.org.service.SubscriptionService;
+import com.stockpilot.backend.org.service.SubscriptionUsageService;
 import com.stockpilot.backend.shared.exception.base.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.base.ResourceNotFoundException;
 import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
@@ -34,6 +36,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final SubscriptionMapper subscriptionMapper;
     private final AuthenticatedUserProvider authenticatedUserProvider;
     private final ApplicationEventPublisher eventPublisher;
+    private final SubscriptionUsageService subscriptionUsageService;
 
     @Override
     public Subscription createDefaultSubscription(UUID tenantId) {
@@ -118,6 +121,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
         Subscription subscription = getSubscription(tenantId);
+        SubscriptionUsageDto usage =
+                subscriptionUsageService.getUsage(tenantId);
 
         return SubscriptionDto.builder()
                 .planCode(subscription.getPlanCode())
@@ -127,7 +132,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .planExpiresAt(subscription.getPlanExpiresAt())
                 .active(subscription.isActive())
                 .limits(subscriptionMapper.toLimitsDto(subscription))
-                .usage(null)
+                .usage(usage)
                 .build();
     }
 
