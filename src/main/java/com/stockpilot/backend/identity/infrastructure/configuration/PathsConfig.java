@@ -19,6 +19,7 @@ public class PathsConfig {
                 "/api/v1/auth/logout-all/public",
                 "/api/v1/auth/forgot-password/public",
                 "/api/v1/auth/reset-password/public",
+                "/api/v1/auth/change-password/public",
                 "/api/v1/auth/accept-invitation",
                 "/api/csrf-token/public",
                 "/actuator/health",

@@ -12,6 +12,7 @@ import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
+import com.stockpilot.backend.shared.validation.PasswordPolicyValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,7 @@ public class PasswordResetService {
     private final UserSessionRepository userSessionRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final RequestAuditContext requestContext;
+    private final PasswordPolicyValidator passwordPolicyValidator;
 
     @Transactional
     public void initiate(ForgotPasswordRequest forgotPasswordRequest) {
@@ -68,7 +70,14 @@ public class PasswordResetService {
         }
 
         User user = passwordResetToken.getUser();
+
+        passwordPolicyValidator.validate(
+                resetPasswordRequest.getNewPassword(),
+                user.getTenantId()
+        );
+
         user.setPasswordHash(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+        user.setPasswordChangedAt(Instant.now());
         userRepository.save(user);
 
         passwordResetToken.setUsed(true);

@@ -4,6 +4,7 @@ import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.identity.application.dto.*;
 import com.stockpilot.backend.identity.application.service.*;
 import com.stockpilot.backend.identity.domain.enums.VerificationResult;
+import com.stockpilot.backend.shared.api.ApiMessages;
 import com.stockpilot.backend.shared.api.ApiResponse;
 import com.stockpilot.backend.shared.api.ApiRoutes;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,6 +76,20 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
         passwordResetService.complete(resetPasswordRequest);
         return ResponseEntity.ok(ApiResponse.success(null, "Password has been reset successfully"));
+    }
+
+    @PutMapping("/change-password/public")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        authService.changePassword(request);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        ApiMessages.PASSWORD_CHANGED
+                )
+        );
     }
 
     @GetMapping("/verify-email/public")
