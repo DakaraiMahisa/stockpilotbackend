@@ -2,15 +2,14 @@ package com.stockpilot.backend.identity.application.service;
 
 import com.stockpilot.backend.identity.api.request.RegisterOrganizationRequest;
 import com.stockpilot.backend.identity.application.dto.AcceptInvitationRequestDto;
+import com.stockpilot.backend.identity.application.dto.ChangePasswordRequest;
 import com.stockpilot.backend.identity.application.dto.LoginRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
-import com.stockpilot.backend.identity.audits.events.InvitationAcceptedEvent;
-import com.stockpilot.backend.identity.audits.events.LoginFailedEvent;
+import com.stockpilot.backend.identity.audits.events.*;
 import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
-import com.stockpilot.backend.identity.audits.events.UserRegisteredEvent;
 import com.stockpilot.backend.identity.exception.AccountDisabledException;
 import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
 import com.stockpilot.backend.identity.exception.InvalidInvitationTokenException;
@@ -19,13 +18,17 @@ import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
 import com.stockpilot.backend.identity.usermanagement.repository.InvitationTokenRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
+import com.stockpilot.backend.org.entity.OrgSettings;
+import com.stockpilot.backend.org.exception.MaintenanceModeException;
+import com.stockpilot.backend.org.service.OrgSettingsService;
 import com.stockpilot.backend.org.service.provisioning.OrganizationProvisioningService;
 import com.stockpilot.backend.shared.exception.base.BusinessRuleException;
 import com.stockpilot.backend.shared.exception.base.DuplicateResourceException;
 import com.stockpilot.backend.shared.exception.base.ResourceNotFoundException;
+import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
+import com.stockpilot.backend.shared.validation.PasswordPolicyValidator;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
-import com.stockpilot.backend.identity.audits.events.LoginSuccessEvent;
 import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
@@ -64,6 +67,9 @@ public class AuthService {
     private final ApplicationEventPublisher eventPublisher;
     private final TenantCodeGenerator tenantCodeGenerator;
     private final RequestAuditContext requestContext;
+    private final OrgSettingsService orgSettingsService;
+    private final PasswordPolicyValidator passwordPolicyValidator;
+    private final AuthenticatedUserProvider authenticatedUserProvider;
 
     @Transactional
     public void registerOrganization(RegisterOrganizationRequest request) {
@@ -115,6 +121,10 @@ public class AuthService {
         roleProvisioningService.provisionDefaultRoles(
                 tenant.getId()
         );
+        passwordPolicyValidator.validate(
+                request.getPassword(),
+                tenant.getId()
+        );
 
         // Fetch OWNER role
         Role ownerRole = roleRepository
@@ -137,6 +147,7 @@ public class AuthService {
                                 request.getPassword()
                         )
                 )
+                .passwordChangedAt(Instant.now())
                 .firstName(request.getFirstName().trim())
                 .lastName(request.getLastName().trim())
                 .role(ownerRole)
@@ -243,6 +254,27 @@ public class AuthService {
 
             throw new AccountDisabledException(
                     "Please verify your email before logging in."
+            );
+        }
+
+        OrgSettings settings =
+                orgSettingsService.getSettings(user.getTenantId());
+
+        if (settings.getMaintenanceMode()
+                && user.getRole().getName() != RoleName.OWNER) {
+
+            eventPublisher.publishEvent(
+                    new LoginFailedEvent(
+                            request.getTenantCode(),
+                            request.getEmail(),
+                            "MAINTENANCE_MODE",
+                            request.getDeviceInfo(),
+                            requestContext.getClientIp()
+                    )
+            );
+
+            throw new MaintenanceModeException(
+                    "This organization is currently under maintenance. Please try again later."
             );
         }
 
@@ -355,10 +387,15 @@ public class AuthService {
             );
         }
 
+        passwordPolicyValidator.validate(
+                request.password(),
+                user.getTenantId()
+        );
+
         user.setPasswordHash(
                 passwordEncoder.encode(request.password())
         );
-
+        user.setPasswordChangedAt(Instant.now());
         user.setEmailVerified(true);
         user.setActive(true);
         user.setStatus(UserStatus.ACTIVE);
@@ -376,6 +413,76 @@ public class AuthService {
                         requestContext.getClientIp(),
                         requestContext.getUserAgent()
                 )
+        );
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+
+        UUID userId = authenticatedUserProvider.getCurrentUserId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found."
+                ));
+
+        if (!passwordEncoder.matches(
+                request.currentPassword(),
+                user.getPasswordHash()
+        )) {
+            throw new InvalidCredentialsException(
+                    "Current password is incorrect."
+            );
+        }
+
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new BusinessRuleException(
+                    "New password and confirmation password do not match."
+            );
+        }
+
+        if (passwordEncoder.matches(
+                request.newPassword(),
+                user.getPasswordHash()
+        )) {
+            throw new BusinessRuleException(
+                    "New password must be different from the current password."
+            );
+        }
+
+        passwordPolicyValidator.validate(
+                request.newPassword(),
+                user.getTenantId()
+        );
+
+        user.setPasswordHash(
+                passwordEncoder.encode(request.newPassword())
+        );
+        user.setPasswordChangedAt(Instant.now());
+
+        userRepository.save(user);
+
+        refreshTokenRepository.deleteAllByUserId(user.getId());
+
+        userSessionRepository.revokeAllUserSessions(
+                user.getId(),
+                user.getTenantId(),
+                Instant.now()
+        );
+
+        eventPublisher.publishEvent(
+                new PasswordChangedEvent(
+                        user.getId(),
+                        user.getTenantId(),
+                        requestContext.getClientIp(),
+                        requestContext.getUserAgent()
+                )
+        );
+
+        log.info(
+                "Password changed successfully for userId={} tenantId={}",
+                user.getId(),
+                user.getTenantId()
         );
     }
 }

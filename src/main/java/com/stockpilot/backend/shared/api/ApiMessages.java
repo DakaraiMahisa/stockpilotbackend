@@ -3,6 +3,13 @@ package com.stockpilot.backend.shared.api;
 public final class ApiMessages {
 
     // ============================================================
+    //  AUTH API MESSAGES
+    // ============================================================
+
+    public static final String PASSWORD_CHANGED = "Password changed successfully.";
+
+
+    // ============================================================
     //  ORGANIZATION API MESSAGES
     // ============================================================
 
@@ -19,7 +26,7 @@ public final class ApiMessages {
     public static final String ORG_LOGO_UPDATED =
             "Organization logo updated successfully.";
     public static final String ORG_LOGO_RETRIEVED =
-            "Organization logo updated successfully." ;
+            "Organization logo retrieved successfully." ;
 
     public static final String ORG_LOGO_NOT_FOUND=
             "Organization logo not found." ;
@@ -59,6 +66,21 @@ public final class ApiMessages {
 
     public static final String SUBSCRIPTION_UPGRADE_REQUEST_SUBMITTED =
             "Subscription upgrade request submitted successfully.";
+
+    public static final String ORG_SETTINGS_RETRIEVED =
+            "Organization settings retrieved successfully.";
+
+    public static final String PASSWORD_POLICY_UPDATED =
+            "Password policy updated successfully.";
+
+    public static final String SESSION_POLICY_UPDATED =
+            "Session policy updated successfully.";
+
+    public static final String INVITE_POLICY_UPDATED =
+            "Invitation policy updated successfully.";
+
+    public static final String GENERAL_SETTINGS_UPDATED =
+            "General settings updated successfully.";
 
     // ============================================================
     // FUTURE API MESSAGES

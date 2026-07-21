@@ -3,6 +3,7 @@ package com.stockpilot.backend.shared.exception;
 import com.stockpilot.backend.identity.exception.*;
 import com.stockpilot.backend.org.exception.InactiveBranchException;
 import com.stockpilot.backend.org.exception.InsufficientStockException;
+import com.stockpilot.backend.org.exception.MaintenanceModeException;
 import com.stockpilot.backend.shared.api.ApiResponse;
 import com.stockpilot.backend.shared.exception.base.*;
 import lombok.extern.slf4j.Slf4j;
@@ -230,6 +231,15 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(MaintenanceModeException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaintenanceModeException(
+            MaintenanceModeException ex
+    ) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+
     @ExceptionHandler({
             InvalidInvitationTokenException.class,
             InvitationAlreadyUsedException.class
@@ -253,4 +263,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(PasswordPolicyViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePasswordPolicyViolationException(
+            PasswordPolicyViolationException ex
+    ) {
+
+        return ResponseEntity.badRequest()
+                .body(
+                        ApiResponse.error(ex.getMessage())
+                );
+    }
 }

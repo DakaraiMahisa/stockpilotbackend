@@ -83,5 +83,12 @@ public class User extends TenantAwareEntity {
 
     @Column(name = "locked_at", columnDefinition = "TIMESTAMPTZ")
     private Instant lockedAt;
+
+    @Column(
+            name = "password_changed_at",
+            nullable = false,
+            columnDefinition = "TIMESTAMPTZ"
+    )
+    private Instant passwordChangedAt;
 }
 
