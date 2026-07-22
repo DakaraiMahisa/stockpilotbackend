@@ -3,7 +3,6 @@ package com.stockpilot.backend.org.dto.request;
 import com.stockpilot.backend.shared.validation.annotation.ValidPasswordExpiryDays;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 
 @Builder
