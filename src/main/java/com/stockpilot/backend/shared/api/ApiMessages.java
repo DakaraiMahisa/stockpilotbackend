@@ -83,9 +83,26 @@ public final class ApiMessages {
             "General settings updated successfully.";
 
     // ============================================================
-    // FUTURE API MESSAGES
+    // CATEGORY API MESSAGES
     // =================================================================
 
+    public static final String CATEGORY_RETRIEVED =
+            "Category retrieved successfully.";
+
+    public static final String CATEGORY_CREATED =
+            "Category created successfully.";
+
+    public static final String CATEGORY_UPDATED =
+            "Category updated successfully.";
+
+    public static final String CATEGORY_DELETED =
+            "Category deleted successfully.";
+
+    public static final String CATEGORY_TREE_RETRIEVED =
+            "Category tree retrieved successfully.";
+
+    public static final String CATEGORY_MOVED =
+            "Category moved successfully.";
 
     private ApiMessages() {}
 }

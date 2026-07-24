@@ -1,9 +1,10 @@
 package com.stockpilot.backend.identity.infrastructure.security.permission;
 
 
+import com.stockpilot.backend.catalog.permissions.CategoryPermissions;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
-import com.stockpilot.backend.shared.security.permissions.*;
+import com.stockpilot.backend.org.permissions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -126,6 +127,8 @@ public class DefaultRolePermissionPolicy {
 
                 TaxConfigPermissions.READ,
 
+                CategoryPermissions.READ,
+
                 InventoryPermissions.READ,
 
                 SupplierPermissions.READ,
@@ -143,6 +146,7 @@ public class DefaultRolePermissionPolicy {
                 TaxConfigPermissions.READ,
                 TaxConfigPermissions.RESOLVE,
 
+                CategoryPermissions.READ,
                 SalesPermissions.READ,
                 SalesPermissions.CREATE,
                 CustomerPermissions.READ
@@ -157,6 +161,8 @@ public class DefaultRolePermissionPolicy {
                 BusinessConfigPermissions.READ,
 
                 TaxConfigPermissions.READ,
+
+                CategoryPermissions.READ,
 
                 InventoryPermissions.READ,
                 InventoryPermissions.UPDATE,
@@ -174,6 +180,7 @@ public class DefaultRolePermissionPolicy {
                 BusinessConfigPermissions.READ,
                 TaxConfigPermissions.READ,
 
+                CategoryPermissions.READ,
                 ReportPermissions.READ,
                 FinancePermissions.READ
         );
