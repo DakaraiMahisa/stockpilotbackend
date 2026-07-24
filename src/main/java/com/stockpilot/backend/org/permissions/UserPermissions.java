@@ -1,4 +1,4 @@
-package com.stockpilot.backend.shared.security.permissions;
+package com.stockpilot.backend.org.permissions;
 
 public final class UserPermissions {
 

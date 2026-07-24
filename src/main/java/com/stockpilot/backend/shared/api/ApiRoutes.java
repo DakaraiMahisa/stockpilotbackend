@@ -19,4 +19,8 @@ public final class ApiRoutes {
     public static final String TAX = ORGANIZATIONS + "/tax";
     public static final String SUBSCRIPTIONS = ORGANIZATIONS+ "/subscriptions";
     public static final String ORG_SETTINGS = ORGANIZATIONS  + "/org-settings";
+
+
+    public static final String CATALOG = API_V1 + "/catalog";
+    public static final String CATEGORIES = CATALOG + "/categories";
 }
