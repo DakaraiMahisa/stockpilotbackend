@@ -14,11 +14,17 @@ public record CategoryTreeDto(
 
         String code,
 
+        UUID parentId,
+
+        String description,
+
         Integer level,
 
         boolean leaf,
 
         Integer sortOrder,
+
+        boolean active,
 
         List<CategoryTreeDto> children
 

@@ -31,6 +31,7 @@ public interface CategoryMapper {
     @Mapping(target = "parentId", source = "parent.id")
     CategoryDto toDto(Category category);
 
+    @Mapping(target = "parentId", source = "parent.id")
     @Mapping(target = "level", ignore = true)
     @Mapping(target = "leaf", ignore = true)
     @Mapping(target = "children", ignore = true)
