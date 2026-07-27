@@ -23,7 +23,7 @@ public class OrgSettingsController {
     private final OrgSettingsService orgSettingsService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrgSettingsPermissions).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.OrgSettingsPermissions).READ)")
     public ResponseEntity<ApiResponse<OrgSettingsDto>> getSettings() {
 
         return ResponseEntity.ok(
@@ -35,7 +35,7 @@ public class OrgSettingsController {
     }
 
     @PutMapping("/password-policy")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrgSettingsPermissions).UPDATE_PASSWORD_POLICY)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.OrgSettingsPermissions).UPDATE_PASSWORD_POLICY)")
     public ResponseEntity<ApiResponse<OrgSettingsDto>> updatePasswordPolicy(
             @Valid @RequestBody UpdatePasswordPolicyRequest request
     ) {
@@ -49,7 +49,7 @@ public class OrgSettingsController {
     }
 
     @PutMapping("/session-policy")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrgSettingsPermissions).UPDATE_SESSION_POLICY)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.OrgSettingsPermissions).UPDATE_SESSION_POLICY)")
     public ResponseEntity<ApiResponse<OrgSettingsDto>> updateSessionPolicy(
             @Valid @RequestBody UpdateSessionPolicyRequest request
     ) {
@@ -63,7 +63,7 @@ public class OrgSettingsController {
     }
 
     @PutMapping("/invite-policy")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrgSettingsPermissions).UPDATE_INVITE_POLICY)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.OrgSettingsPermissions).UPDATE_INVITE_POLICY)")
     public ResponseEntity<ApiResponse<OrgSettingsDto>> updateInvitePolicy(
             @Valid @RequestBody UpdateInvitePolicyRequest request
     ) {
@@ -77,7 +77,7 @@ public class OrgSettingsController {
     }
 
     @PutMapping("/general")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.OrgSettingsPermissions).UPDATE_GENERAL)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.OrgSettingsPermissions).UPDATE_GENERAL)")
     public ResponseEntity<ApiResponse<OrgSettingsDto>> updateGeneralSettings(
             @Valid @RequestBody UpdateGeneralSettingsRequest request
     ) {

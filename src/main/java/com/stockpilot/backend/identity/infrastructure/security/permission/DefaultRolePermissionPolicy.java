@@ -4,6 +4,7 @@ package com.stockpilot.backend.identity.infrastructure.security.permission;
 import com.stockpilot.backend.catalog.permissions.CategoryPermissions;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
+import com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions;
 import com.stockpilot.backend.org.permissions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

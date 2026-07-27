@@ -25,7 +25,7 @@ public class UserController {
     private final UserManagementService userManagementService;
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).READ)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions).READ)"
     )
     @GetMapping
     public ResponseEntity<ApiResponse<Page<UserSummaryDto>>> listUsers(
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).READ)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions).READ)"
     )
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse< UserDetailsDto>> getUser(
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.SessionPermissions).READ)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.SessionPermissions).READ)"
     )
     @GetMapping("/{id}/sessions")
     public ResponseEntity<ApiResponse<List<UserSessionDto>>> getUserSessions(
@@ -92,7 +92,7 @@ public class UserController {
     }
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.SessionPermissions).REVOKE)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.SessionPermissions).REVOKE)"
     )
     @DeleteMapping("/{id}/sessions/{sid}")
     public ResponseEntity<ApiResponse<Void>> revokeSession(
@@ -110,7 +110,7 @@ public class UserController {
 
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).DEACTIVATE)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions).DEACTIVATE)"
     )
     @PatchMapping("/{id}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -126,7 +126,7 @@ public class UserController {
 
     @PatchMapping("/{id}/activate")
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).ACTIVATE)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions).ACTIVATE)"
     )
     public ResponseEntity<ApiResponse<Void>> activateUser(
             @PathVariable UUID id
@@ -143,7 +143,7 @@ public class UserController {
     }
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.UserPermissions).INVITE)"
+            "hasAuthority(T(com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions).INVITE)"
     )
     @PostMapping("/invite")
     public ResponseEntity<ApiResponse<Void>> inviteUser(
@@ -162,7 +162,7 @@ public class UserController {
     }
 
     @PreAuthorize(
-            "hasAuthority(T(com.stockpilot.backend.shared.security.permissions.RolePermissions).UPDATE)"
+            "hasAuthority(T(com.stockpilot.backend.identity.rolemanagement.permissions.RolePermissions).UPDATE)"
     )
     @PatchMapping("/{id}/role")
     public ResponseEntity<ApiResponse<Void>> changeUserRole(

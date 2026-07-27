@@ -1,4 +1,4 @@
-package com.stockpilot.backend.org.permissions;
+package com.stockpilot.backend.identity.rolemanagement.permissions;
 
 
 public final class RolePermissions {

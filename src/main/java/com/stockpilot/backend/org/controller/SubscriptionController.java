@@ -22,7 +22,7 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @GetMapping
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.SubscriptionPermissions).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.SubscriptionPermissions).READ)")
     public ResponseEntity<ApiResponse<SubscriptionDto>> getCurrentSubscription() {
 
         return ResponseEntity.ok(
@@ -34,7 +34,7 @@ public class SubscriptionController {
     }
 
     @PostMapping("/upgrade-request")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.SubscriptionPermissions).UPGRADE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.SubscriptionPermissions).UPGRADE)")
     public ResponseEntity<ApiResponse<UpgradeRequestResponse>> submitUpgradeRequest(
             @Valid @RequestBody SubscriptionUpgradeRequest request
     ) {

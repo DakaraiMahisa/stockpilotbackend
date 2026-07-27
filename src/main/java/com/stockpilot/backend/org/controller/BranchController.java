@@ -29,7 +29,7 @@ public class BranchController {
 
     private final BranchService branchService;
 
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BranchPermissions).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.BranchPermissions).READ)")
     @GetMapping
     public ResponseEntity<ApiResponse<Page<BranchDto>>> getBranches(
             @RequestParam(required = false) BranchStatus status,
@@ -43,7 +43,7 @@ public class BranchController {
         );
     }
 
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BranchPermissions).CREATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.BranchPermissions).CREATE)")
     @PostMapping
     public ResponseEntity<ApiResponse<BranchDto>> createBranch(
             @Valid @RequestBody CreateBranchRequest request
@@ -55,7 +55,7 @@ public class BranchController {
                 .body(ApiResponse.success(branch));
     }
 
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BranchPermissions).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.BranchPermissions).READ)")
     @GetMapping("/{branchId}")
     public ResponseEntity<ApiResponse<BranchDto>> getBranch(
             @PathVariable UUID branchId
@@ -67,7 +67,7 @@ public class BranchController {
         );
     }
 
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BranchPermissions).UPDATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.BranchPermissions).UPDATE)")
     @PutMapping("/{branchId}")
     public ResponseEntity<ApiResponse<BranchDto>> updateBranch(
             @PathVariable UUID branchId,
@@ -81,7 +81,7 @@ public class BranchController {
         );
     }
 
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BranchPermissions).UPDATE_STATUS)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.BranchPermissions).UPDATE_STATUS)")
     @PatchMapping("/{branchId}/status")
     public ResponseEntity<ApiResponse<BranchDto>> updateBranchStatus(
             @PathVariable UUID branchId,
@@ -95,7 +95,7 @@ public class BranchController {
         );
     }
 
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.BranchPermissions).SET_DEFAULT)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.org.permissions.BranchPermissions).SET_DEFAULT)")
     @PatchMapping("/{branchId}/default")
     public ResponseEntity<ApiResponse<DefaultBranchResponse>> setDefaultBranch(
             @PathVariable UUID branchId

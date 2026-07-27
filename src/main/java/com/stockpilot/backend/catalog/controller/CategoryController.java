@@ -27,7 +27,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.CategoryPermissions).CREATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.CategoryPermissions).CREATE)")
     public ResponseEntity<ApiResponse<CategoryDto>> createCategory(
             @Valid @RequestBody CreateCategoryRequest request
     ) {
@@ -43,7 +43,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.CategoryPermissions).UPDATE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.CategoryPermissions).UPDATE)")
     public ResponseEntity<ApiResponse<CategoryDto>> updateCategory(
             @PathVariable UUID categoryId,
             @Valid @RequestBody UpdateCategoryRequest request
@@ -58,7 +58,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.CategoryPermissions).DELETE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.CategoryPermissions).DELETE)")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(
             @PathVariable UUID categoryId
     ) {
@@ -74,7 +74,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.CategoryPermissions).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.CategoryPermissions).READ)")
     public ResponseEntity<ApiResponse<CategoryDto>> getCategory(
             @PathVariable UUID categoryId
     ) {
@@ -88,7 +88,7 @@ public class CategoryController {
     }
 
     @GetMapping("/tree")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.CategoryPermissions).READ)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.CategoryPermissions).READ)")
     public ResponseEntity<ApiResponse<List<CategoryTreeDto>>> getCategoryTree() {
 
         return ResponseEntity.ok(
@@ -100,7 +100,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}/move")
-    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.shared.security.permissions.CategoryPermissions).MOVE)")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.CategoryPermissions).MOVE)")
     public ResponseEntity<ApiResponse<CategoryDto>> moveCategory(
             @PathVariable UUID categoryId,
             @Valid @RequestBody MoveCategoryRequest request
