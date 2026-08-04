@@ -104,5 +104,23 @@ public final class ApiMessages {
     public static final String CATEGORY_MOVED =
             "Category moved successfully.";
 
+    // ============================================================
+    // BRAND API MESSAGES
+    // =================================================================
+    public static final String BRAND_RETRIEVED =
+            "Brand retrieved successfully.";
+
+    public static final String BRAND_CREATED =
+            "Brand created successfully.";
+
+    public static final String BRAND_UPDATED =
+            "Brand updated successfully.";
+
+    public static final String BRAND_DELETED =
+            "Brand deleted successfully.";
+
+    public static final String BRAND_DEACTIVATED =
+            "Brand deactivated successfully.";
+
     private ApiMessages() {}
 }
