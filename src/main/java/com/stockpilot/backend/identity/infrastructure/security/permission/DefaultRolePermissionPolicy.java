@@ -1,6 +1,7 @@
 package com.stockpilot.backend.identity.infrastructure.security.permission;
 
 
+import com.stockpilot.backend.catalog.permissions.BrandPermissions;
 import com.stockpilot.backend.catalog.permissions.CategoryPermissions;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
@@ -111,6 +112,10 @@ public class DefaultRolePermissionPolicy {
                 CategoryPermissions.CREATE,
                 CategoryPermissions.UPDATE,
 
+                BrandPermissions.READ,
+                BrandPermissions.CREATE,
+                BrandPermissions.UPDATE,
+
                 ReportPermissions.READ
         );
     }
@@ -129,12 +134,11 @@ public class DefaultRolePermissionPolicy {
                 TaxConfigPermissions.READ,
 
                 CategoryPermissions.READ,
+                BrandPermissions.READ,
 
                 InventoryPermissions.READ,
 
-                SupplierPermissions.READ,
-
-                CategoryPermissions.READ
+                SupplierPermissions.READ
         );
     }
     private Set<String> cashierPermissionCodes() {
@@ -148,6 +152,7 @@ public class DefaultRolePermissionPolicy {
                 TaxConfigPermissions.RESOLVE,
 
                 CategoryPermissions.READ,
+                BrandPermissions.READ,
                 SalesPermissions.READ,
                 SalesPermissions.CREATE,
                 CustomerPermissions.READ
@@ -164,6 +169,7 @@ public class DefaultRolePermissionPolicy {
                 TaxConfigPermissions.READ,
 
                 CategoryPermissions.READ,
+                BrandPermissions.READ,
 
                 InventoryPermissions.READ,
                 InventoryPermissions.UPDATE,
@@ -182,6 +188,8 @@ public class DefaultRolePermissionPolicy {
                 TaxConfigPermissions.READ,
 
                 CategoryPermissions.READ,
+
+                BrandPermissions.READ,
                 ReportPermissions.READ,
                 FinancePermissions.READ
         );

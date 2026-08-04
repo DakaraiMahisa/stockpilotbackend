@@ -39,7 +39,7 @@ public class PathsConfig {
                 "/api/v1/users/**",
                 "/api/v1/roles/**",
                 "/api/v1/org/**",
-                "/api/v1/catalog/categories/**"
+                "/api/v1/catalog/**"
 
         );
     }

@@ -2,7 +2,6 @@ package com.stockpilot.backend.identity.infrastructure.security.permission;
 
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.entity.Role;
-import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.repository.PermissionRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
