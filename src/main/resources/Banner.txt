@@ -1,12 +1,10 @@
 ${AnsiStyle.BOLD}${AnsiColor.CYAN}
- .oooooo..o ooooooooooooo   .oooooo.     .oooooo.   oooo    oooo ooooooooo.   ooooo ooooo          .oooooo.   ooooooooooooo
-d8P'    `Y8 8'   888   `8  d8P'  `Y8b   d8P'  `Y8b  `888   .8P'  `888   `Y88. `888' `888'         d8P'  `Y8b  8'   888   `8
-Y88bo.           888      888      888 888           888  d8'     888   .d88'  888   888         888      888      888
- `"Y8888o.       888      888      888 888           88888[       888ooo88P'   888   888         888      888      888
-     `"Y88b      888      888      888 888           888`88b.     888          888   888         888      888      888
-oo     .d8P      888      `88b    d88' `88b    ooo   888  `88b.   888          888   888       o `88b    d88'      888
-8""88888P'      o888o      `Y8bood8P'   `Y8bood8P'  o888o  o888o o888o        o888o o888ooooood8  `Y8bood8P'      o888o
-
+         __             __         _ __      __
+   _____/ /_____  _____/ /______  (_) /___  / /_
+  / ___/ __/ __ \/ ___/ //_/ __ \/ / / __ \/ __/
+ (__  ) /_/ /_/ / /__/ ,< / /_/ / / / /_/ / /_
+/____/\__/\____/\___/_/|_/ .___/_/_/\____/\__/
+                        /_/
 ${AnsiColor.GREEN}
 ${application.title} ${application.version}
 Powered by Spring Boot ${spring-boot.version}

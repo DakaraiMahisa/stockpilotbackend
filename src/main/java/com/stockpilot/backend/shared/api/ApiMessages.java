@@ -107,6 +107,7 @@ public final class ApiMessages {
     // ============================================================
     // BRAND API MESSAGES
     // =================================================================
+
     public static final String BRAND_RETRIEVED =
             "Brand retrieved successfully.";
 
@@ -121,6 +122,27 @@ public final class ApiMessages {
 
     public static final String BRAND_DEACTIVATED =
             "Brand deactivated successfully.";
+
+    // ============================================================
+    // Product API MESSAGES
+    // =================================================================
+
+    public static final String PRODUCT_RETRIEVED =
+            "Product retrieved successfully.";
+    public static final String PRODUCTS_RETRIEVED =
+            "Products retrieved successfully.";
+
+    public static final String PRODUCT_CREATED =
+            "Product created successfully.";
+
+    public static final String PRODUCT_UPDATED =
+            "Product updated successfully.";
+
+    public static final String PRODUCT_DELETED =
+            "Product deleted successfully.";
+
+    public static final String PRODUCT_DEACTIVATED =
+            "Product deactivated successfully.";
 
     private ApiMessages() {}
 }

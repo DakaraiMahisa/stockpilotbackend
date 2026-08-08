@@ -38,4 +38,5 @@ public interface BrandRepository extends JpaRepository<Brand, UUID>, JpaSpecific
     Optional<Brand> findByTenantIdAndCodeIgnoreCase(UUID tenantId, String code);
 
     Optional<Brand> findByTenantIdAndNameIgnoreCase(UUID tenantId, String name);
+    Optional<Brand> findByIdAndTenantIdAndDeletedFalse(UUID brandId, UUID tenantId);
 }

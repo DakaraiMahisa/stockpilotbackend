@@ -24,4 +24,5 @@ public final class ApiRoutes {
     public static final String CATALOG = API_V1 + "/catalog";
     public static final String CATEGORIES = CATALOG + "/categories";
     public static final String BRANDS = CATALOG + "/brands";
+    public static final String PRODUCTS = CATALOG + "/products";
 }
