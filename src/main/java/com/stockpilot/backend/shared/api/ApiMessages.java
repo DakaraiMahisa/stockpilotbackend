@@ -144,5 +144,22 @@ public final class ApiMessages {
     public static final String PRODUCT_DEACTIVATED =
             "Product deactivated successfully.";
 
+    public static final String PRODUCT_VARIANTS_CREATED =
+            "Product variants created successfully";
+    public static final String PRODUCT_VARIANTS_FETCHED =
+            "Product variants fetched successfully";
+
+    public static final String PRODUCT_VARIANT_FETCHED =
+            "Product variant retrieved successfully";
+
+    public static final String PRODUCT_VARIANT_UPDATED =
+            "Product variant updated successfully";
+
+    public static final String PRODUCT_VARIANT_DEACTIVATED =
+            "Product variant deactivated successfully";
+
+    public static final String PRODUCT_VARIANT_DELETED =
+            "Product variant deleted successfully";
+
     private ApiMessages() {}
 }

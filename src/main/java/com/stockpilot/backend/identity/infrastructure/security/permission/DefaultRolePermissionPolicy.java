@@ -1,9 +1,7 @@
 package com.stockpilot.backend.identity.infrastructure.security.permission;
 
 
-import com.stockpilot.backend.catalog.permissions.BrandPermissions;
-import com.stockpilot.backend.catalog.permissions.CategoryPermissions;
-import com.stockpilot.backend.catalog.permissions.ProductPermissions;
+import com.stockpilot.backend.catalog.permissions.*;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions;
@@ -117,6 +115,14 @@ public class DefaultRolePermissionPolicy {
                 BrandPermissions.CREATE,
                 BrandPermissions.UPDATE,
 
+                ProductVariantPermissions.READ,
+                ProductVariantPermissions.CREATE,
+                ProductVariantPermissions.UPDATE,
+
+                CatalogPricingPermissions.READ,
+                CatalogPricingPermissions.CREATE,
+                CatalogPricingPermissions.UPDATE,
+
                 ProductPermissions.READ,
                 ProductPermissions.CREATE,
                 ProductPermissions.UPDATE,
@@ -141,6 +147,8 @@ public class DefaultRolePermissionPolicy {
                 CategoryPermissions.READ,
                 BrandPermissions.READ,
                 ProductPermissions.READ,
+                ProductVariantPermissions.READ,
+                CatalogPricingPermissions.READ,
                 InventoryPermissions.READ,
 
                 SupplierPermissions.READ
@@ -159,6 +167,8 @@ public class DefaultRolePermissionPolicy {
                 CategoryPermissions.READ,
                 BrandPermissions.READ,
                 ProductPermissions.READ,
+                ProductVariantPermissions.READ,
+                CatalogPricingPermissions.READ,
                 SalesPermissions.READ,
                 SalesPermissions.CREATE,
                 CustomerPermissions.READ
@@ -177,6 +187,9 @@ public class DefaultRolePermissionPolicy {
                 CategoryPermissions.READ,
                 BrandPermissions.READ,
                 ProductPermissions.READ,
+                ProductVariantPermissions.READ,
+                CatalogPricingPermissions.READ,
+
 
                 InventoryPermissions.READ,
                 InventoryPermissions.UPDATE,
@@ -196,6 +209,8 @@ public class DefaultRolePermissionPolicy {
 
                 CategoryPermissions.READ,
                 ProductPermissions.READ,
+                ProductVariantPermissions.READ,
+                CatalogPricingPermissions.READ,
 
                 BrandPermissions.READ,
                 ReportPermissions.READ,
