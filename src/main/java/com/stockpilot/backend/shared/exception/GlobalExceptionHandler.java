@@ -132,6 +132,14 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiResponse<Void>> handleValidationException(
+            BadRequestException ex) {
+        log.warn("Bad request exception: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(StorageException.class)
     public ResponseEntity<ApiResponse<Void>> handleStorageException(
             ValidationException ex) {
