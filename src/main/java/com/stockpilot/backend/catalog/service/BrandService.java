@@ -32,4 +32,6 @@ public interface BrandService {
     List<BrandSummaryDto> getActiveBrands();
 
     void deactivateBrand(UUID brandId);
+
+    BrandDto activateBrand(UUID brandId);
 }

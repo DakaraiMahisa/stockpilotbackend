@@ -140,10 +140,20 @@ public class BrandServiceImpl implements BrandService {
 
         UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
 
-        Specification<Brand> specification = Specification
-                .where(BrandSpecifications.hasTenant(tenantId))
-                .and(BrandSpecifications.nameOrCodeContains(search))
-                .and(BrandSpecifications.hasActive(active));
+        Specification<Brand> specification =
+                BrandSpecifications.hasTenant(tenantId);
+
+        if (search != null && !search.isBlank()) {
+            specification = specification.and(
+                    BrandSpecifications.nameOrCodeContains(search.trim())
+            );
+        }
+
+        if (active != null) {
+            specification = specification.and(
+                    BrandSpecifications.hasActive(active)
+            );
+        }
 
         return brandRepository.findAll(specification, pageable)
                 .map(brandMapper::toDto);
@@ -175,6 +185,21 @@ public class BrandServiceImpl implements BrandService {
         brand.setActive(false);
 
         brandRepository.save(brand);
+    }
+
+    @Override
+    @Transactional
+    public BrandDto activateBrand(UUID brandId) {
+
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+
+        Brand brand = getBrandEntity(brandId, tenantId);
+
+        brand.setActive(true);
+
+        Brand activatedBrand = brandRepository.save(brand);
+
+        return brandMapper.toDto(activatedBrand);
     }
 
     // Helper methods

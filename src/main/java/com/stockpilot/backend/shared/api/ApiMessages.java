@@ -123,6 +123,9 @@ public final class ApiMessages {
     public static final String BRAND_DEACTIVATED =
             "Brand deactivated successfully.";
 
+    public static final String BRAND_ACTIVATED =
+            "Brand activated successfully.";
+
     // ============================================================
     // Product API MESSAGES
     // =================================================================

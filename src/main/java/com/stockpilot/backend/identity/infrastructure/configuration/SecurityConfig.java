@@ -1,6 +1,7 @@
 package com.stockpilot.backend.identity.infrastructure.configuration;
 
-import com.stockpilot.backend.identity.infrastructure.security.csrf.CustomAccessDeniedHandler;
+import com.stockpilot.backend.identity.infrastructure.security.handler.CustomAccessDeniedHandler;
+import com.stockpilot.backend.identity.infrastructure.security.handler.CustomAuthenticationEntryPoint;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,6 +42,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -53,6 +55,7 @@ public class SecurityConfig {
                         .csrfTokenRepository(tokenRepository)
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .cors(corsConfig -> corsConfig.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session

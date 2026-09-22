@@ -15,6 +15,8 @@ public record ProductDto(
 
         String name,
 
+        String description,
+
         UUID categoryId,
 
         String categoryName,
@@ -23,7 +25,21 @@ public record ProductDto(
 
         String brandName,
 
+        UUID taxClassId,
+
+        String taxClassName,
+
         UnitOfMeasure unitOfMeasure,
+
+        Boolean trackBatches,
+
+        Integer minStockLevel,
+
+        Integer maxStockLevel,
+
+        Boolean service,
+
+        BigDecimal weightKg,
 
         BigDecimal retailPrice,
 

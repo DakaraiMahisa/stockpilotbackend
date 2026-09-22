@@ -84,6 +84,11 @@ public class ProductServiceImpl implements ProductService {
                 tenantId
         );
 
+        validateStockLevelRange(
+                request.minStockLevel(),
+                request.maxStockLevel()
+        );
+
         Product product = productMapper.toEntity(request);
 
         product.setTenantId(tenantId);
@@ -176,10 +181,37 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
+        Integer effectiveMinStockLevel =
+                request.minStockLevel() != null
+                        ? request.minStockLevel()
+                        : product.getMinStockLevel();
+
+        Integer effectiveMaxStockLevel =
+                request.maxStockLevel() != null
+                        ? request.maxStockLevel()
+                        : product.getMaxStockLevel();
+
+        validateStockLevelRange(
+                effectiveMinStockLevel,
+                effectiveMaxStockLevel
+        );
+
         productMapper.updateEntityFromRequest(
                 request,
                 product
         );
+
+        if (request.barcode() != null) {
+            product.setBarcode(request.barcode());
+        }
+
+        if (request.unitOfMeasure() != null) {
+            product.setUnitOfMeasure(request.unitOfMeasure());
+        }
+
+        if (request.active() != null) {
+            product.setActive(request.active());
+        }
 
         if (category != null) {
             product.setCategory(category);
@@ -459,5 +491,20 @@ public class ProductServiceImpl implements ProductService {
                         new ResourceNotFoundException(
                                 "Category not found."
                         ));
+    }
+
+    private void validateStockLevelRange(
+            Integer minStockLevel,
+            Integer maxStockLevel
+    ) {
+        if (minStockLevel == null || maxStockLevel == null) {
+            return;
+        }
+
+        if (minStockLevel > maxStockLevel) {
+            throw new BusinessException(
+                    "Minimum stock level must not exceed maximum stock level."
+            );
+        }
     }
 }

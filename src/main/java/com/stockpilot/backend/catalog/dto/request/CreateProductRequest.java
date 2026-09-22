@@ -42,7 +42,7 @@ public record CreateProductRequest(
         @Min(0)
         Integer minStockLevel,
 
-        @Positive
+        @Min(0)
         Integer maxStockLevel,
 
         Boolean service,

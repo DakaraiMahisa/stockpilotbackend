@@ -112,4 +112,17 @@ public class BrandController {
                 )
         );
     }
+
+    @PatchMapping("/{brandId}/activate")
+    @PreAuthorize("hasAuthority(T(com.stockpilot.backend.catalog.permissions.BrandPermissions).UPDATE)")
+    public ResponseEntity<ApiResponse<BrandDto>> activateBrand(
+            @PathVariable UUID brandId
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        brandService.activateBrand(brandId),
+                        ApiMessages.BRAND_ACTIVATED
+                )
+        );
+    }
 }

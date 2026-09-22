@@ -1,4 +1,4 @@
-package com.stockpilot.backend.identity.infrastructure.security.csrf;
+package com.stockpilot.backend.identity.infrastructure.security.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

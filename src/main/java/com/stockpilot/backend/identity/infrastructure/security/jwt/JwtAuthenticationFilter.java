@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -32,34 +30,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String token = extractTokenFromRequest(request);
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
-            if (token != null && jwtService.validateToken(token)) {
-                CurrentUserPrincipal session = jwtService.extractUserSession(token);
+        String token = extractTokenFromRequest(request);
 
-                TenantContext.setTenantId(session.getTenantId());
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        session, null, session.getAuthorities()
-                );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-
+        if (token == null) {
             filterChain.doFilter(request, response);
+            return;
+        }
 
-        } catch (Exception e) {
-            log.error("Could not set user authentication in security context", e);
+        if (!jwtService.validateToken(token)) {
             SecurityContextHolder.clearContext();
+
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            CurrentUserPrincipal principal =
+                    jwtService.extractUserSession(token);
+
+            TenantContext.setTenantId(principal.getTenantId());
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            principal,
+                            null,
+                            principal.getAuthorities()
+                    );
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource()
+                            .buildDetails(request)
+            );
+
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authentication);
+
+            filterChain.doFilter(request, response);
+
         } finally {
             TenantContext.clear();
         }
     }
-
 
     private String extractTokenFromRequest(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
@@ -69,33 +87,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return null;
-    }
-
-
-    private void setSecurityContext(String token) {
-        String email = jwtService.extractEmail(token);
-        List<String> permissions = jwtService.extractPermissions(token);
-        var tenantId = jwtService.extractTenantId(token);
-
-        if (email != null && tenantId != null) {
-            List<SimpleGrantedAuthority> authorities = permissions.stream()
-                    .map(permission -> new SimpleGrantedAuthority("ROLE_" + permission))
-                    .collect(Collectors.toList());
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, authorities);
-
-            authentication.setDetails(java.util.Map.of(
-                    "tenantId", tenantId.toString(),
-                    "email", email
-            ));
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Set tenant-aware authentication for user: {} in tenant: {} with permissions: {}", 
-                    email, tenantId, permissions);
-        } else {
-            log.warn("Failed to extract email or tenantId from JWT token");
-        }
     }
 }
 

@@ -34,6 +34,9 @@ public interface ProductMapper {
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "categoryName", source = "category.name")
 
+    @Mapping(target = "taxClassId", source = "taxClass.id")
+    @Mapping(target = "taxClassName", source = "taxClass.name")
+
     @Mapping(target = "retailPrice", ignore = true)
     @Mapping(target = "stockQty", ignore = true)
     ProductDto toDto(Product product);
