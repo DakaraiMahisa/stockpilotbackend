@@ -119,61 +119,77 @@ public interface ProductRepository extends
     );
     @Query(
             value = """
-                SELECT p.*
-                FROM products p
-                WHERE p.tenant_id = :tenantId
-                  AND p.deleted = FALSE
+            SELECT p.*
+            FROM products p
+            WHERE p.tenant_id = :tenantId
+              AND p.deleted = FALSE
 
-                  AND (
-                        :active IS NULL
-                        OR p.active = :active
-                  )
+              AND (
+                    :active IS NULL
+                    OR p.active = :active
+              )
 
-                  AND (
-                        :categoryId IS NULL
-                        OR p.category_id = :categoryId
-                  )
+              AND (
+                    :categoryId IS NULL
+                    OR p.category_id = :categoryId
+              )
 
-                  AND (
-                        :brandId IS NULL
-                        OR p.brand_id = :brandId
-                  )
+              AND (
+                    :brandId IS NULL
+                    OR p.brand_id = :brandId
+              )
 
-                  AND (
-                        :search IS NULL
-                        OR TRIM(:search) = ''
-                        OR p.search_vector @@
-                           websearch_to_tsquery('english', :search)
-                  )
-                """,
+              AND (
+                    :search IS NULL
+                    OR TRIM(:search) = ''
+                    OR p.search_vector @@
+                       to_tsquery(
+                           'english',
+                           regexp_replace(
+                               trim(:search),
+                               '\\s+',
+                               ':* & ',
+                               'g'
+                           ) || ':*'
+                       )
+              )
+            """,
             countQuery = """
-                SELECT COUNT(*)
-                FROM products p
-                WHERE p.tenant_id = :tenantId
-                  AND p.deleted = FALSE
+            SELECT COUNT(*)
+            FROM products p
+            WHERE p.tenant_id = :tenantId
+              AND p.deleted = FALSE
 
-                  AND (
-                        :active IS NULL
-                        OR p.active = :active
-                  )
+              AND (
+                    :active IS NULL
+                    OR p.active = :active
+              )
 
-                  AND (
-                        :categoryId IS NULL
-                        OR p.category_id = :categoryId
-                  )
+              AND (
+                    :categoryId IS NULL
+                    OR p.category_id = :categoryId
+              )
 
-                  AND (
-                        :brandId IS NULL
-                        OR p.brand_id = :brandId
-                  )
+              AND (
+                    :brandId IS NULL
+                    OR p.brand_id = :brandId
+              )
 
-                  AND (
-                        :search IS NULL
-                        OR TRIM(:search) = ''
-                        OR p.search_vector @@
-                           websearch_to_tsquery('english', :search)
-                  )
-                """,
+              AND (
+                    :search IS NULL
+                    OR TRIM(:search) = ''
+                    OR p.search_vector @@
+                       to_tsquery(
+                           'english',
+                           regexp_replace(
+                               trim(:search),
+                               '\\s+',
+                               ':* & ',
+                               'g'
+                           ) || ':*'
+                       )
+              )
+            """,
             nativeQuery = true
     )
     Page<Product> searchProducts(

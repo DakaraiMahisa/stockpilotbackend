@@ -147,6 +147,9 @@ public final class ApiMessages {
     public static final String PRODUCT_DEACTIVATED =
             "Product deactivated successfully.";
 
+    public static final String PRODUCT_ACTIVATED =
+            "Product activated successfully.";
+
     public static final String PRODUCT_VARIANTS_CREATED =
             "Product variants created successfully";
     public static final String PRODUCT_VARIANTS_FETCHED =
@@ -163,6 +166,58 @@ public final class ApiMessages {
 
     public static final String PRODUCT_VARIANT_DELETED =
             "Product variant deleted successfully";
+
+    public static final String PRODUCT_VARIANT_ATTRIBUTES_FETCHED =
+            "Product variant fetched successfully";
+
+    public static final String VARIANT_ATTRIBUTE_CREATED =
+            "Variant attribute created successfully";
+
+    public static final String PRODUCT_VARIANT_ATTRIBUTE_ASSIGNED =
+            "Variant attribute assigned to product successfully";
+
+    public static final String PRODUCT_VARIANT_ATTRIBUTE_REMOVED =
+            "Variant attribute removed from product successfully";
+
+    public static final String VARIANT_ATTRIBUTES_FETCHED =
+            "Variant attributes fetched successfully";
+
+    public static final String VARIANT_ATTRIBUTE_FETCHED =
+            "Variant attribute fetched successfully";
+
+    public static final String VARIANT_ATTRIBUTE_UPDATED =
+            "Variant attribute updated successfully";
+
+    public static final String VARIANT_ATTRIBUTE_ACTIVATED =
+            "Variant attribute activated successfully";
+
+    public static final String VARIANT_ATTRIBUTE_DEACTIVATED =
+            "Variant attribute deactivated successfully";
+
+    public static final String VARIANT_ATTRIBUTE_DELETED =
+            "Variant attribute deleted successfully";
+
+    public static final String VARIANT_ATTRIBUTE_VALUE_CREATED =
+            "Variant attribute value created successfully";
+
+    public static final String VARIANT_ATTRIBUTE_VALUES_FETCHED =
+            "Variant attribute values fetched successfully";
+
+    public static final String VARIANT_ATTRIBUTE_VALUE_FETCHED =
+            "Variant attribute value fetched successfully";
+
+    public static final String VARIANT_ATTRIBUTE_VALUE_UPDATED =
+            "Variant attribute value updated successfully";
+
+    public static final String VARIANT_ATTRIBUTE_VALUE_ACTIVATED =
+            "Variant attribute value activated successfully";
+
+    public static final String VARIANT_ATTRIBUTE_VALUE_DEACTIVATED =
+            "Variant attribute value deactivated successfully";
+
+
+    public static final String VARIANT_ATTRIBUTE_VALUE_DELETED =
+            "Variant attribute value deleted successfully";
 
     private ApiMessages() {}
 }

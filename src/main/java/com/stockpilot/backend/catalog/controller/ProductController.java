@@ -128,7 +128,7 @@ public class ProductController {
         );
     }
 
-    @DeleteMapping("/{productId}")
+    @PatchMapping("/{productId}")
     @PreAuthorize(
             "hasAuthority(T(com.stockpilot.backend.catalog.permissions.ProductPermissions).DELETE)"
     )
@@ -142,6 +142,24 @@ public class ProductController {
                 ApiResponse.success(
                         null,
                         ApiMessages.PRODUCT_DEACTIVATED
+                )
+        );
+    }
+
+    @PatchMapping("/{productId}/activate")
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.catalog.permissions.ProductPermissions).UPDATE)"
+    )
+    public ResponseEntity<ApiResponse<Void>> activateProduct(
+            @PathVariable UUID productId
+    ) {
+
+        productService.activateProduct(productId);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        ApiMessages.PRODUCT_ACTIVATED
                 )
         );
     }

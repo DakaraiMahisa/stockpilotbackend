@@ -11,7 +11,7 @@ public record CreateProductRequest(
 
         @Size(max = 50)
         @Pattern(
-                regexp = "^[A-Za-z0-9-]+$",
+                regexp = "^$|^[A-Za-z0-9-]+$",
                 message = "SKU may contain only letters, numbers and hyphens."
         )
         String sku,

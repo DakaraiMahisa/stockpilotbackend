@@ -3,6 +3,7 @@ package com.stockpilot.backend.catalog.controller;
 import com.stockpilot.backend.catalog.dto.request.CreateProductVariantRequest;
 import com.stockpilot.backend.catalog.dto.request.UpdateProductVariantRequest;
 import com.stockpilot.backend.catalog.dto.response.ProductVariantDto;
+import com.stockpilot.backend.catalog.dto.response.VariantAttributeDto;
 import com.stockpilot.backend.catalog.service.ProductVariantService;
 import com.stockpilot.backend.shared.api.ApiResponse;
 import com.stockpilot.backend.shared.api.ApiMessages;
@@ -147,4 +148,63 @@ public class ProductVariantController {
                 )
         );
     }
+
+    @GetMapping("/{productId}/variants/attributes")
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.catalog.permissions.ProductVariantPermissions).READ)"
+    )
+    public ResponseEntity<ApiResponse<List<VariantAttributeDto>>> getVariantAttributes(
+            @PathVariable UUID productId
+    ) {
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        productVariantService.getVariantAttributes(productId),
+                        ApiMessages.PRODUCT_VARIANT_ATTRIBUTES_FETCHED
+                )
+        );
+    }
+
+    @PostMapping("/{productId}/variants/attributes/{attributeId}")
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.catalog.permissions.ProductVariantPermissions).CREATE)"
+    )
+    public ResponseEntity<ApiResponse<Void>> assignVariantAttribute(
+            @PathVariable UUID productId,
+            @PathVariable UUID attributeId
+    ) {
+        productVariantService.assignVariantAttribute(
+                productId,
+                attributeId
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        null,
+                        ApiMessages.PRODUCT_VARIANT_ATTRIBUTE_ASSIGNED
+                ));
+    }
+
+    @DeleteMapping("/{productId}/variants/attributes/{attributeId}")
+    @PreAuthorize(
+            "hasAuthority(T(com.stockpilot.backend.catalog.permissions.ProductVariantPermissions).UPDATE)"
+    )
+    public ResponseEntity<ApiResponse<Void>> removeVariantAttribute(
+            @PathVariable UUID productId,
+            @PathVariable UUID attributeId
+    ) {
+        productVariantService.removeVariantAttribute(
+                productId,
+                attributeId
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        ApiMessages.PRODUCT_VARIANT_ATTRIBUTE_REMOVED
+                )
+        );
+    }
+
 }

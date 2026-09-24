@@ -87,4 +87,10 @@ public interface PriceListItemRepository
             UUID tenantId
     );
 
+    Optional<PriceListItem> findByIdAndTenantIdAndPriceListIdAndDeletedFalse(
+            UUID id,
+            UUID tenantId,
+            UUID priceListId
+    );
+
 }

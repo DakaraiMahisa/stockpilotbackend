@@ -335,6 +335,28 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
+    @Override
+    @Transactional
+    public void activateProduct(UUID productId) {
+
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+
+        Product product = productRepository
+                .findByIdAndTenantIdAndDeletedFalse(
+                        productId,
+                        tenantId
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Product not found."
+                        )
+                );
+
+        product.setActive(true);
+
+        productRepository.save(product);
+    }
+
     //Helper methods
     private void validateLeafCategory(Category category) {
 

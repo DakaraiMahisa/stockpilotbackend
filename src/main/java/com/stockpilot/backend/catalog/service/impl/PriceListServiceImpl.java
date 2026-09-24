@@ -73,6 +73,7 @@ public class PriceListServiceImpl implements PriceListService {
         }
 
         PriceList priceList = PriceList.builder()
+                .tenantId(tenantId)
                 .name(request.name().trim())
                 .code(request.code().trim().toUpperCase())
                 .priceListType(request.priceListType())
@@ -82,7 +83,6 @@ public class PriceListServiceImpl implements PriceListService {
                 .validTo(request.validTo())
                 .active(request.active())
                 .build();
-
         PriceList saved = priceListRepository.save(priceList);
 
         return toDto(saved);
@@ -179,6 +179,7 @@ public class PriceListServiceImpl implements PriceListService {
     }
 
     @Override
+    @Transactional
     public List<PriceListItemDto> upsertItems(
             UUID tenantId,
             UUID priceListId,
@@ -265,6 +266,33 @@ public class PriceListServiceImpl implements PriceListService {
                 .stream()
                 .map(this::toItemDto)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteItem(
+            UUID tenantId,
+            UUID priceListId,
+            UUID itemId
+    ) {
+        // Ensures the price list exists and belongs to the tenant.
+        PriceList priceList = getPriceList(tenantId, priceListId);
+
+        PriceListItem item = priceListItemRepository
+                .findByIdAndTenantIdAndPriceListIdAndDeletedFalse(
+                        itemId,
+                        tenantId,
+                        priceList.getId()
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Price list item not found."
+                        )
+                );
+
+        item.setDeleted(true);
+
+        priceListItemRepository.save(item);
     }
 
     private PriceList getPriceList(

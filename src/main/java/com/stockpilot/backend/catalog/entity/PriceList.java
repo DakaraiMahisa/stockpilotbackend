@@ -4,6 +4,7 @@ import com.stockpilot.backend.catalog.enums.PriceListType;
 import com.stockpilot.backend.shared.entity.TenantAwareEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Types;
@@ -39,7 +40,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class PriceList extends TenantAwareEntity {
 
     @Column(nullable = false, length = 100)

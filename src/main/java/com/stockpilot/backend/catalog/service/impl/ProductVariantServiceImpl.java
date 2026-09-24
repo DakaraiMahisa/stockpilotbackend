@@ -3,15 +3,15 @@ package com.stockpilot.backend.catalog.service.impl;
 import com.stockpilot.backend.catalog.dto.request.CreateProductVariantRequest;
 import com.stockpilot.backend.catalog.dto.request.UpdateProductVariantRequest;
 import com.stockpilot.backend.catalog.dto.response.ProductVariantDto;
+import com.stockpilot.backend.catalog.dto.response.VariantAttributeDto;
+import com.stockpilot.backend.catalog.dto.response.VariantAttributeValueDto;
 import com.stockpilot.backend.catalog.entity.*;
 
 import com.stockpilot.backend.catalog.mapper.ProductVariantMapper;
-import com.stockpilot.backend.catalog.repository.ProductRepository;
-import com.stockpilot.backend.catalog.repository.ProductVariantAttributeRepository;
-import com.stockpilot.backend.catalog.repository.ProductVariantRepository;
-import com.stockpilot.backend.catalog.repository.VariantAttributeValueRepository;
+import com.stockpilot.backend.catalog.repository.*;
 import com.stockpilot.backend.catalog.service.ProductVariantService;
 
+import com.stockpilot.backend.shared.exception.base.BusinessException;
 import com.stockpilot.backend.shared.exception.base.BusinessRuleException;
 import com.stockpilot.backend.shared.exception.base.ResourceNotFoundException;
 import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
@@ -34,15 +34,18 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductVariantAttributeRepository productVariantAttributeRepository;
     private final VariantAttributeValueRepository variantAttributeValueRepository;
+    private final VariantAttributeRepository variantAttributeRepository;
     private final ProductVariantMapper productVariantMapper;
     private final AuthenticatedUserProvider authenticatedUserProvider;
     private final ObjectMapper objectMapper;
 
     @Override
+    @Transactional
     public List<ProductVariantDto> createVariants(
             UUID productId,
             List<CreateProductVariantRequest> requests
     ) {
+        UUID tenantId = getTenantId();
 
         Product product = getProduct(productId);
 
@@ -73,6 +76,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             );
 
             ProductVariant variant = ProductVariant.builder()
+                    .tenantId(tenantId)
                     .product(product)
                     .sku(sku)
                     .barcode(request.barcode())
@@ -249,6 +253,170 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         productVariantRepository.save(variant);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VariantAttributeDto> getVariantAttributes(
+            UUID productId
+    ) {
+
+        Product product = getProduct(productId);
+
+        UUID tenantId = getTenantId();
+
+        return productVariantAttributeRepository
+                .findAllByProductIdAndTenantIdOrderBySortOrderAsc(
+                        product.getId(),
+                        tenantId
+                )
+                .stream()
+                .map(productVariantAttribute -> {
+
+                    VariantAttribute attribute =
+                            productVariantAttribute.getAttribute();
+
+                    List<VariantAttributeValueDto> values =
+                            variantAttributeValueRepository
+                                    .findAllByAttributeIdAndTenantIdAndActiveTrueOrderBySortOrderAsc(
+                                            attribute.getId(),
+                                            tenantId
+                                    )
+                                    .stream()
+                                    .map(value ->
+                                            new VariantAttributeValueDto(
+                                                    value.getId(),
+                                                    attribute.getId(),
+                                                    value.getValue(),
+                                                    value.getCode(),
+                                                    value.isActive(),
+                                                    value.getSortOrder()
+                                            )
+                                    )
+                                    .toList();
+
+                    return new VariantAttributeDto(
+                            attribute.getId(),
+                            attribute.getName(),
+                            attribute.getCode(),
+                            attribute.getDescription(),
+                            attribute.isActive(),
+                            values
+                    );
+                })
+                .toList();
+    }
+
+
+    @Override
+    @Transactional
+    public void assignVariantAttribute(
+            UUID productId,
+            UUID attributeId
+    ) {
+        UUID tenantId = getTenantId();
+
+        Product product = productRepository
+                .findByIdAndTenantIdAndDeletedFalse(productId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found"
+                ));
+
+        VariantAttribute attribute = variantAttributeRepository
+                .findByIdAndTenantId(attributeId, tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Variant attribute not found"
+                ));
+
+        if (!attribute.isActive()) {
+            throw new BusinessException(
+                    "Cannot assign an inactive variant attribute"
+            );
+        }
+
+        boolean alreadyAssigned =
+                productVariantAttributeRepository
+                        .existsByProductIdAndAttributeIdAndTenantId(
+                                productId,
+                                attributeId,
+                                tenantId
+                        );
+
+        if (alreadyAssigned) {
+            throw new BusinessException(
+                    "Variant attribute is already assigned to this product"
+            );
+        }
+
+        int nextSortOrder =
+                productVariantAttributeRepository
+                        .findAllByProductIdAndTenantIdOrderBySortOrderAsc(
+                                productId,
+                                tenantId
+                        )
+                        .stream()
+                        .mapToInt(ProductVariantAttribute::getSortOrder)
+                        .max()
+                        .orElse(-1) + 1;
+
+        ProductVariantAttribute assignment =
+                ProductVariantAttribute.builder()
+                        .tenantId(tenantId)
+                        .product(product)
+                        .attribute(attribute)
+                        .sortOrder(nextSortOrder)
+                        .build();
+
+        productVariantAttributeRepository.save(assignment);
+    }
+
+    @Override
+    @Transactional
+    public void removeVariantAttribute(
+            UUID productId,
+            UUID attributeId
+    ) {
+        UUID tenantId = getTenantId();
+
+        if (productRepository
+                .findByIdAndTenantIdAndDeletedFalse(productId, tenantId)
+                .isEmpty()) {
+
+            throw new ResourceNotFoundException(
+                    "Product not found"
+            );
+        }
+
+        if (variantAttributeRepository
+                .findByIdAndTenantId(attributeId, tenantId)
+                .isEmpty()) {
+
+            throw new ResourceNotFoundException(
+                    "Variant attribute not found"
+            );
+        }
+
+        boolean assigned =
+                productVariantAttributeRepository
+                        .existsByProductIdAndAttributeIdAndTenantId(
+                                productId,
+                                attributeId,
+                                tenantId
+                        );
+
+        if (!assigned) {
+            throw new ResourceNotFoundException(
+                    "Variant attribute is not assigned to this product"
+            );
+        }
+
+        productVariantAttributeRepository
+                .deleteByProductIdAndAttributeIdAndTenantId(
+                        productId,
+                        attributeId,
+                        tenantId
+                );
+    }
+
     private Product getProduct(UUID productId) {
 
         UUID tenantId = getTenantId();
@@ -284,6 +452,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
                         )
                 );
     }
+
     private void validateRequests(
             List<CreateProductVariantRequest> requests
     ) {
@@ -349,6 +518,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
             );
         }
     }
+
     private void validateAttributeCombination(
             UUID productId,
             Map<String, String> attributes

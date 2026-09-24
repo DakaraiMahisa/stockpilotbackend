@@ -31,4 +31,5 @@ public interface ProductService {
 
     void deactivateProduct(UUID productId);
 
+    void activateProduct(UUID productId);
 }

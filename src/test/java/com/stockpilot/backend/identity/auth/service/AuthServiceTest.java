@@ -12,7 +12,7 @@ import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.repository.PermissionRepository;
-import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
+
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
@@ -70,8 +70,6 @@ public class AuthServiceTest {
     @Mock
     private OrganizationProvisioningService organizationProvisioningService;
 
-    @Mock
-    private RefreshTokenRepository refreshTokenRepository;
 
     @Mock
     private UserSessionRepository userSessionRepository;

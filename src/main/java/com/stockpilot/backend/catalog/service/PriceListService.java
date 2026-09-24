@@ -49,4 +49,10 @@ public interface PriceListService {
             UUID priceListId,
             List<PriceListItemRequest> requests
     );
+
+    void deleteItem(
+            UUID tenantId,
+            UUID priceListId,
+            UUID itemId
+    );
 }

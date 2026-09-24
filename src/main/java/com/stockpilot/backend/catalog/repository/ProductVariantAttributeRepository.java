@@ -29,6 +29,11 @@ public interface ProductVariantAttributeRepository
             UUID tenantId
     );
 
+    boolean existsByAttributeIdAndTenantId(
+            UUID attributeId,
+            UUID tenantId
+    );
+
     void deleteByProductIdAndAttributeIdAndTenantId(
             UUID productId,
             UUID attributeId,

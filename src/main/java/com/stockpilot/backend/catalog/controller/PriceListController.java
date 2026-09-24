@@ -187,4 +187,26 @@ public class PriceListController {
                 )
         );
     }
+
+    @DeleteMapping("/{priceListId}/items/{itemId}")
+    @PreAuthorize("hasAuthority('catalog-pricing:delete')")
+    public ResponseEntity<ApiResponse<Void>> deleteItem(
+            @PathVariable UUID priceListId,
+            @PathVariable UUID itemId
+    ) {
+        UUID tenantId = authenticatedUserProvider.getCurrentTenantId();
+
+        priceListService.deleteItem(
+                tenantId,
+                priceListId,
+                itemId
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        null,
+                        "Price list item deleted successfully."
+                )
+        );
+    }
 }

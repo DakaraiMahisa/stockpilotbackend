@@ -7,12 +7,12 @@ import com.stockpilot.backend.identity.application.dto.LoginRequest;
 import com.stockpilot.backend.identity.application.dto.TokenResponse;
 import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
 import com.stockpilot.backend.identity.audits.events.*;
-import com.stockpilot.backend.identity.domain.entity.RefreshToken;
 import com.stockpilot.backend.identity.domain.entity.Role;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.exception.AccountDisabledException;
 import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
 import com.stockpilot.backend.identity.exception.InvalidInvitationTokenException;
+import com.stockpilot.backend.identity.infrastructure.security.RefreshTokenHasher;
 import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
@@ -30,7 +30,6 @@ import com.stockpilot.backend.shared.validation.PasswordPolicyValidator;
 import com.stockpilot.backend.tenant.domain.entity.Tenant;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
-import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.tenant.domain.repository.TenantRepository;
@@ -44,8 +43,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,8 +62,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final RoleProvisioningService roleProvisioningService;
     private final OrganizationProvisioningService organizationProvisioningService;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final UserSessionRepository userSessionRepository;
+    private final RefreshTokenHasher refreshTokenHasher;
     private final InvitationTokenRepository invitationTokenRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final TenantCodeGenerator tenantCodeGenerator;
@@ -285,13 +286,13 @@ public class AuthService {
 
         CurrentUserPrincipal currentUserPrincipal = CurrentUserPrincipal.fromUser(user, permissions);
 
-        RefreshToken refreshToken = createAndPersistRefreshToken(user, request.getDeviceInfo());
+        String refreshToken = generateRefreshToken();
+
         UserSession session = persistUserSession(
                 user,
                 refreshToken,
                 request
         );
-        refreshToken.setSessionId(session.getId());
         String accessToken = jwtService.generateAccessToken(
                 currentUserPrincipal,
                 session.getId()
@@ -306,61 +307,53 @@ public class AuthService {
         );
         return TokenResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
+                .refreshToken(refreshToken)
                 .build();
-    }
-
-    private RefreshToken createAndPersistRefreshToken(
-            User user,
-            String deviceInfo) {
-
-        RefreshToken refreshToken =
-                refreshTokenRepository
-                        .findByUser(user)
-                        .orElseGet(() ->
-                                RefreshToken.builder()
-                                        .user(user)
-                                        .build()
-                        );
-
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(
-                Instant.now().plus(7, ChronoUnit.DAYS)
-        );
-        refreshToken.setDeviceInfo(deviceInfo);
-
-        return refreshTokenRepository.save(refreshToken);
     }
 
     private UserSession persistUserSession(
             User user,
-            RefreshToken refreshToken,
+            String refreshToken,
             LoginRequest request
     ) {
+        Instant now = Instant.now();
 
         UserSession session = new UserSession();
 
         session.setTenantId(user.getTenantId());
-
         session.setUserId(user.getId());
 
         session.setRefreshTokenHash(
-                passwordEncoder.encode(refreshToken.getToken())
+                refreshTokenHasher.hash(refreshToken)
         );
 
-        session.setUserAgent(request.getDeviceInfo());
+        session.setIpAddress(
+                requestContext.getClientIp()
+        );
 
-        session.setLastUsedAt(Instant.now());
+        session.setUserAgent(
+                request.getDeviceInfo()
+        );
+
+        session.setLastUsedAt(now);
 
         session.setExpiresAt(
-                refreshToken.getExpiryDate()
+                now.plus(7, ChronoUnit.DAYS)
         );
 
         session.setRevoked(false);
 
-       return userSessionRepository.save(session);
+        return userSessionRepository.save(session);
     }
+    private String generateRefreshToken() {
+        byte[] bytes = new byte[32];
 
+        new SecureRandom().nextBytes(bytes);
+
+        return Base64.getUrlEncoder()
+                .withoutPadding()
+                .encodeToString(bytes);
+    }
     @Transactional
     public void acceptInvitation(
             AcceptInvitationRequestDto request
@@ -461,8 +454,6 @@ public class AuthService {
         user.setPasswordChangedAt(Instant.now());
 
         userRepository.save(user);
-
-        refreshTokenRepository.deleteAllByUserId(user.getId());
 
         userSessionRepository.revokeAllUserSessions(
                 user.getId(),

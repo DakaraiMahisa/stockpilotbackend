@@ -3,12 +3,10 @@ package com.stockpilot.backend.identity.application.service;
 import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
 import com.stockpilot.backend.identity.audits.enums.SessionRevocationReason;
 import com.stockpilot.backend.identity.audits.events.SessionRevokedEvent;
-import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.identity.exception.InvalidTokenException;
-import com.stockpilot.backend.shared.utils.AuthenticatedUserProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -22,10 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SessionService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtService jwtService;
 
-    private final AuthenticatedUserProvider authenticatedUserProvider;
     private final ApplicationEventPublisher eventPublisher;
     private final RequestAuditContext requestContext;
     private final UserSessionRepository userSessionRepository;
@@ -51,7 +47,6 @@ public class SessionService {
         UUID userId = jwtService.extractUserId(jwt);
         UUID tenantId = jwtService.extractTenantId(jwt);
 
-        refreshTokenRepository.deleteAllByUserId(userId);
 
         userSessionRepository.revokeAllUserSessions(
                 userId,
@@ -108,7 +103,6 @@ public class SessionService {
             return;
         }
 
-        refreshTokenRepository.deleteBySessionId(sessionId);
 
         session.setRevoked(true);
         session.setRevokedAt(Instant.now());

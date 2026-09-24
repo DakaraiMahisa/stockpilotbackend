@@ -8,7 +8,6 @@ import com.stockpilot.backend.identity.audits.events.PasswordResetEvent;
 import com.stockpilot.backend.identity.domain.entity.PasswordResetToken;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.repository.PasswordResetTokenRepository;
-import com.stockpilot.backend.identity.domain.repository.RefreshTokenRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
@@ -31,7 +30,6 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final UserSessionRepository userSessionRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final RequestAuditContext requestContext;
@@ -83,7 +81,6 @@ public class PasswordResetService {
         passwordResetToken.setUsed(true);
         passwordResetTokenRepository.save(passwordResetToken);
 
-        refreshTokenRepository.deleteAllByUserId(user.getId());
         userSessionRepository.revokeAllUserSessions(
                 user.getId(),
                 user.getTenantId(),

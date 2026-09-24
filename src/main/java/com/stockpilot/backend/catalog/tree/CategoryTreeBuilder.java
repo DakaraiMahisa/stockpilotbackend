@@ -63,6 +63,7 @@ public class CategoryTreeBuilder {
                 .level(level)
                 .leaf(children.isEmpty())
                 .sortOrder(category.getSortOrder())
+                .active(category.isActive())
                 .children(children)
                 .build();
     }
