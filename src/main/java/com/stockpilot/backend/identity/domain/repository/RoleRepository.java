@@ -16,9 +16,20 @@ import java.util.UUID;
 public interface RoleRepository extends JpaRepository<Role, UUID> {
 
 
-    @Query("SELECT p.code FROM Role r JOIN r.permissions p " +
-            "WHERE r.id = :roleId AND r.deleted = false")
-    Set<String> findPermissionsByRoleId(@Param("roleId") UUID roleId);
+
+    @Query("""
+    SELECT p.code
+    FROM Role r
+    JOIN r.permissions p
+    WHERE r.id = :roleId
+      AND r.tenantId = :tenantId
+      AND r.deleted = false
+    """)
+    Set<String> findPermissionsByRoleIdAndTenantId(
+            @Param("roleId") UUID roleId,
+            @Param("tenantId") UUID tenantId
+    );
+
 
     Optional<Role> findByIdAndTenantId(UUID id, UUID tenantId);
 

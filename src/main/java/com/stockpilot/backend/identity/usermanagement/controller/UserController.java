@@ -1,5 +1,6 @@
 package com.stockpilot.backend.identity.usermanagement.controller;
 
+import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
 import com.stockpilot.backend.identity.usermanagement.dto.*;
 import com.stockpilot.backend.identity.usermanagement.service.UserManagementService;
 import com.stockpilot.backend.shared.api.ApiResponse;
@@ -12,9 +13,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -174,6 +177,22 @@ public class UserController {
                 ApiResponse.success(
                         null,
                         "User role changed successfully."
+                )
+        );
+    }
+
+    @GetMapping("/me/permissions")
+    public ResponseEntity<ApiResponse<Set<String>>> getCurrentUserPermissions() {
+        CurrentUserPrincipal principal =
+                (CurrentUserPrincipal) SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        principal.getPermissions(),
+                        "Current user permissions retrieved successfully."
                 )
         );
     }

@@ -13,6 +13,7 @@ import com.stockpilot.backend.identity.exception.AccountDisabledException;
 import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
 import com.stockpilot.backend.identity.exception.InvalidInvitationTokenException;
 import com.stockpilot.backend.identity.infrastructure.security.RefreshTokenHasher;
+import com.stockpilot.backend.identity.infrastructure.security.permission.PermissionResolutionService;
 import com.stockpilot.backend.identity.usermanagement.entity.InvitationToken;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.enums.UserStatus;
@@ -71,6 +72,7 @@ public class AuthService {
     private final OrgSettingsService orgSettingsService;
     private final PasswordPolicyValidator passwordPolicyValidator;
     private final AuthenticatedUserProvider authenticatedUserProvider;
+    private final PermissionResolutionService permissionResolutionService;
 
     @Transactional
     public void registerOrganization(RegisterOrganizationRequest request) {
@@ -279,7 +281,11 @@ public class AuthService {
             );
         }
 
-        Set<String> permissions = roleRepository.findPermissionsByRoleId(user.getRole().getId());
+        Set<String> permissions =
+                permissionResolutionService.resolveForRole(
+                        user.getTenantId(),
+                        user.getRole().getId()
+                );
 
         user.setLastLoginAt(Instant.now());
         userRepository.save(user);

@@ -6,11 +6,11 @@ import com.stockpilot.backend.identity.audits.context.RequestAuditContext;
 import com.stockpilot.backend.identity.audits.events.TokenRotatedEvent;
 import com.stockpilot.backend.identity.domain.entity.User;
 import com.stockpilot.backend.identity.domain.model.CurrentUserPrincipal;
-import com.stockpilot.backend.identity.domain.repository.RoleRepository;
 import com.stockpilot.backend.identity.domain.repository.UserRepository;
 import com.stockpilot.backend.identity.infrastructure.security.RefreshTokenHasher;
 import com.stockpilot.backend.identity.infrastructure.security.jwt.JwtService;
 import com.stockpilot.backend.identity.exception.InvalidCredentialsException;
+import com.stockpilot.backend.identity.infrastructure.security.permission.PermissionResolutionService;
 import com.stockpilot.backend.identity.usermanagement.entity.UserSession;
 import com.stockpilot.backend.identity.usermanagement.repository.UserSessionRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,9 @@ public class TokenService {
     private final RefreshTokenHasher refreshTokenHasher;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final RoleRepository roleRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final RequestAuditContext requestContext;
+    private final PermissionResolutionService permissionResolutionService;
 
 
     @Transactional
@@ -87,7 +87,8 @@ public class TokenService {
         }
 
         Set<String> permissions =
-                roleRepository.findPermissionsByRoleId(
+                permissionResolutionService.resolveForRole(
+                        user.getTenantId(),
                         user.getRole().getId()
                 );
 
