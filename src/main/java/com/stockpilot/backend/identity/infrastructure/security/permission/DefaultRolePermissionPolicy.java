@@ -5,6 +5,7 @@ import com.stockpilot.backend.catalog.permissions.*;
 import com.stockpilot.backend.identity.domain.entity.Permission;
 import com.stockpilot.backend.identity.domain.enums.RoleName;
 import com.stockpilot.backend.identity.usermanagement.permissions.UserPermissions;
+import com.stockpilot.backend.inventory.permissions.InventoryPermissions;
 import com.stockpilot.backend.org.permissions.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -99,9 +100,11 @@ public class DefaultRolePermissionPolicy {
 
                 UserPermissions.READ,
 
-                InventoryPermissions.READ,
-                InventoryPermissions.UPDATE,
-                InventoryPermissions.CREATE,
+                InventoryPermissions.STOCK_READ,
+                InventoryPermissions.WAREHOUSE_READ,
+                InventoryPermissions.WAREHOUSE_WRITE,
+                InventoryPermissions.BIN_READ,
+                InventoryPermissions.BIN_WRITE,
 
                 SupplierPermissions.READ,
                 SupplierPermissions.CREATE,
@@ -149,7 +152,9 @@ public class DefaultRolePermissionPolicy {
                 ProductPermissions.READ,
                 ProductVariantPermissions.READ,
                 CatalogPricingPermissions.READ,
-                InventoryPermissions.READ,
+                InventoryPermissions.STOCK_READ,
+                InventoryPermissions.WAREHOUSE_READ,
+                InventoryPermissions.BIN_READ,
 
                 SupplierPermissions.READ
         );
@@ -191,9 +196,11 @@ public class DefaultRolePermissionPolicy {
                 CatalogPricingPermissions.READ,
 
 
-                InventoryPermissions.READ,
-                InventoryPermissions.UPDATE,
-                InventoryPermissions.CREATE,
+                InventoryPermissions.STOCK_READ,
+                InventoryPermissions.WAREHOUSE_READ,
+                InventoryPermissions.WAREHOUSE_WRITE,
+                InventoryPermissions.BIN_READ,
+                InventoryPermissions.BIN_WRITE,
 
                 SupplierPermissions.READ
         );
