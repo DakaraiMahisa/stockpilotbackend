@@ -28,4 +28,7 @@ public final class ApiRoutes {
     public static final String PRICING = CATALOG + "/pricing";
     public static final String PRICE_LISTS = CATALOG + "/price-lists";
     public static final String VARIANT_ATTRIBUTES = CATALOG + "/variant-attributes";
+
+    public static final String INVENTORY = API_V1 +"/inventory";
+    public static final String WAREHOUSES = INVENTORY +"/warehouses";
 }
